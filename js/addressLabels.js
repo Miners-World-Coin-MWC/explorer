@@ -1,6 +1,6 @@
 const addressLabels = {
     // MWC Wallets
-    // "AeD4pPi3D5kB9aMEgH3eRHoD6XMKbrpRAW": "Master Wallet",
+    "97eFcPMFYCyH2Y2qY4tsUS6CkYwTZdQ2am": "Dev Fee Wallet",
     // "AKUg58E171GVJNw2RQzooQnuHs1zns2ecD": "Developer Wallet",
     // "AJzNjXgPYUGe9cmWz2ND7hrEYA1AiwpggX": "Community Wallet",
     // "Ac2DHE6freiBENuzZ3VTfY8zwwKc2oX2Fw": "Charity Wallet",
