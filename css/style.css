@@ -1,0 +1,556 @@
+/* =========================
+   ROOT THEME (MWC)
+========================= */
+:root {
+  --bg-main: #0b0f14;
+  --bg-card: #121821;
+  --bg-nav: #0e141c;
+  --border-soft: #1f2937;
+
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+
+  --accent: #f59e0b;
+  --accent-soft: #fbbf24;
+  --accent-glow: rgba(245, 158, 11, 0.45);
+}
+
+/* =========================
+   LIGHT MODE
+========================= */
+body.light {
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-nav: #f1f5f9;
+  --border-soft: #e5e7eb;
+
+  --text-main: #020617;
+  --text-muted: #475569;
+
+  --accent: #d97706;
+  --accent-soft: #f59e0b;
+  --accent-glow: rgba(217, 119, 6, 0.35);
+}
+
+/* =========================
+   BASE
+========================= */
+html, body {
+  min-height: 100%;
+}
+
+body {
+  font-family: 'Source Sans Pro', sans-serif;
+  padding-bottom: 56px;
+  background: radial-gradient(circle at top, #0f172a, var(--bg-main));
+  color: var(--text-main);
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+  background: linear-gradient(180deg, #0e141c, #0b1118);
+  border-bottom: 1px solid var(--border-soft);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+.navbar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(245,158,11,0.25),
+    transparent 80%
+  );
+  animation: miningSweep 6s infinite ease-in-out;
+}
+
+@keyframes miningSweep {
+  0% { transform: translateX(-100%); opacity: 0; }
+  30% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { transform: translateX(100%); opacity: 0; }
+}
+
+.navbar-brand b {
+  color: var(--accent);
+}
+
+#logo {
+  max-width: 30px;
+  margin-right: 6px;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+/* Space between navbar and first card */
+.navbar + .container {
+  margin-top: 28px;
+}
+
+
+/* =========================
+   CARDS / CONTAINERS
+========================= */
+.card,
+#addressContainer,
+.tabs-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-soft);
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+  color: var(--text-main);
+}
+
+/* =========================
+   INPUTS / BUTTONS
+========================= */
+input,
+textarea {
+  background: #020617;
+  color: var(--text-main);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  padding: 10px;
+}
+
+button {
+  background: linear-gradient(180deg, var(--accent), #d97706);
+  color: #020617;
+  border: none;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* =========================
+   TABS
+========================= */
+.tabs {
+  background: #020617;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.tab-button {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 12px;
+}
+
+.tab-button.active {
+  color: var(--accent);
+  border-bottom: 3px solid var(--accent);
+}
+
+/* =========================
+   TABLES (PEERS / DATA)
+========================= */
+table {
+  background: #020617;
+  color: var(--text-main);
+}
+
+thead th {
+  background: #020617;
+  color: var(--accent-soft);
+  text-transform: uppercase;
+}
+
+tbody tr:hover {
+  background: rgba(245,158,11,0.05);
+}
+
+/* =========================
+   OUTPUT / TERMINAL AREAS
+========================= */
+.addnode-output,
+pre,
+code {
+  background: #020617;
+  color: #e5e7eb;
+  border-radius: 10px;
+  border: 1px solid var(--border-soft);
+}
+
+/* =========================
+   MAP
+========================= */
+#node-map {
+  border-radius: 14px;
+  border: 1px solid var(--border-soft);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 991.98px) {
+  .navbar-nav {
+    flex-direction: column;
+  }
+}
+/* =========================
+        FOOTER SOCIAL LINKS
+        ========================= */
+        .social-links {
+        display: flex;
+        justify-content: center;
+        gap: 22px;
+        }
+
+        .social-links a {
+        text-decoration: none;
+        }
+
+        .social-links i {
+        font-size: 26px;
+        color: var(--text-muted);
+        opacity: 0.85;
+        transition: 0.25s ease;
+        }
+
+        /* Brand hover glow */
+        .social-links a:hover i {
+        opacity: 1;
+        transform: scale(1.25);
+        }
+
+        /* Individual brand colors */
+        .social-links a[href*="discord"]:hover i {
+        color: #5865f2;
+        text-shadow: 0 0 10px rgba(88,101,242,0.6);
+        }
+
+        .social-links a[href*="t.me"]:hover i {
+        color: #229ed9;
+        text-shadow: 0 0 10px rgba(34,158,217,0.6);
+        }
+
+        .social-links a[href*="reddit"]:hover i {
+        color: #ff4500;
+        text-shadow: 0 0 10px rgba(255,69,0,0.6);
+        }
+
+        .social-links a[href*="x.com"]:hover i {
+        color: #ffffff;
+        text-shadow: 0 0 10px rgba(255,255,255,0.6);
+        }
+
+    /* =========================
+   CENTER LOAD MORE BUTTON
+========================= */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.load-btn {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* =========================
+   LAYOUT STABILITY FIX
+========================= */
+html {
+  overflow-y: scroll;
+}
+
+.input-group .btn-outline-dark {
+  border-color: var(--border-soft);
+  color: var(--text-muted);
+}
+
+.input-group .btn-outline-dark:hover {
+  background: var(--accent);
+  color: #020617;
+  border-color: var(--accent);
+}
+
+/* =========================
+   ADDNODES TABS LAYOUT FIX
+========================= */
+.tabs-container {
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+}
+
+.addnode-output {
+  min-height: 220px;
+  max-height: 420px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+
+/* =========================
+   TAB VISIBILITY LOCK
+========================= */
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+
+.peer.online {
+  color: #22c55e;
+}
+
+.peer.offline {
+  color: #ef4444;
+}
+
+
+/* =========================
+   ADDNODES ROWS
+========================= */
+.addnodes-list {
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.addnode-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px dashed var(--border-soft);
+}
+
+.addnode-status {
+  width: 20px;
+  text-align: center;
+}
+
+.addnode-status.online {
+  color: #22c55e;
+}
+
+.addnode-status.offline {
+  color: #ef4444;
+}
+
+.addnode-cmd {
+  flex: 1;
+  white-space: pre;
+}
+
+.addnode-copy {
+  cursor: pointer;
+  color: var(--text-muted);
+}
+
+.addnode-copy:hover {
+  color: var(--accent);
+}
+
+/* =========================
+   WEB WALLET STYLES
+   (Isolated – used only by Web Wallet pages)
+========================= */
+
+/* Button width helpers */
+.b-width {
+  min-width: 100px;
+}
+
+/* Router-controlled pages */
+.router-page {
+  display: none;
+}
+
+/* Utility helpers */
+.c-pointer {
+  cursor: pointer;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.break-lines {
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.break-word {
+  word-wrap: break-word;
+}
+
+/* QR code rendering */
+.qr-code canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* =========================
+   WALLET BALANCE DISPLAY
+========================= */
+.wallet-balance {
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.wallet-balance .text-monospace {
+  font-size: 20px;
+}
+
+.balance-small {
+  font-size: 14px;
+}
+
+.send-balance-fix {
+  padding-bottom: 8px;
+  display: inline-block;
+}
+
+/* =========================
+   ICON FONTS
+========================= */
+[class*="entypo"]:before {
+  font-family: 'EntypoRegular', sans-serif;
+  font-size: 14px;
+}
+
+/* =========================
+   TRANSACTION HISTORY
+========================= */
+.transaction-history-list {
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  border-top: 1px solid var(--border-soft);
+}
+
+.transaction-item {
+  border-bottom: 1px solid var(--border-soft);
+  padding: 8px 0;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.transaction-item.sent {
+  color: #ef4444;
+}
+
+.transaction-item.received {
+  color: #22c55e;
+}
+
+.transaction-item .tx-direction {
+  font-weight: bold;
+}
+
+.transaction-item .tx-amount {
+  font-family: monospace;
+}
+
+/* =========================
+   WALLET – MOBILE TUNING
+========================= */
+@media (max-width: 600px) {
+  .wallet-balance {
+    font-size: 18px;
+  }
+
+  .wallet-balance .text-monospace {
+    font-size: 16px;
+  }
+}
+
+
+/* =========================
+   PAPER WALLET STYLES
+   (Isolated – used only by Paper Wallet pages)
+========================= */
+
+/* Layout helpers */
+.word-break {
+  word-break: break-all;
+  font-family: monospace;
+}
+
+/* Balance display (paper wallets slightly larger) */
+.paper-wallet .wallet-balance {
+  font-size: 23px;
+}
+
+.paper-wallet .wallet-balance .text-monospace {
+  font-size: 20px;
+}
+
+/* QR codes */
+.paper-wallet .qr-code canvas,
+#paper-qr {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Address / key wrapping */
+.paper-wallet .break-lines {
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* =========================
+   PAPER WALLET PRINT MODE
+========================= */
+@media print {
+
+  /* Hide everything by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Only show paper wallet */
+  #paper-wallet,
+  #paper-wallet * {
+    visibility: visible;
+  }
+
+  #paper-wallet {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff;
+    color: #000000;
+  }
+
+  /* QR sizing for print */
+  #paper-qr {
+    width: 128px;
+    height: 128px;
+    margin: 10px auto;
+    display: block;
+  }
+
+  /* Remove shadows & effects */
+  .card,
+  .tabs-container {
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+

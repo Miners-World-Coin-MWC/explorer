@@ -1,0 +1,1835 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="../css/entypo.css">
+
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-sha256/0.9.0/sha256.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/gh/cozmo/jsQR@master/dist/jsQR.js"></script>
+		<script src="js/multilang.js"></script>
+		<script src="js/bitcoinJS-lib.js"></script>
+
+
+		<link rel="stylesheet" href="css/style.css">
+
+		<title>Wallet</title>
+		<meta name="description" content="MinersWorldCoin Web Wallet">
+	</head>
+	<body>
+		<!-- Navbar -->
+		<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+			<div class="container">
+				<a href="#" class="navbar-brand">
+					<img src="img/mwc.png" width="100" height="100" alt="Logo">
+					<b tkey="wallet-title"></b>
+				</a>
+				<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+					<ul class="navbar-nav ml-auto">
+						<li class="nav-item">
+							<a href="#" class="nav-link router-link mr-md-2" data-route="homepage" tkey="home"></a>
+						</li>
+						<li class="nav-item">
+							<a href="#/create" class="nav-link router-link mr-md-2" data-route="create" tkey="create"></a>
+						</li>
+						<li class="nav-item">
+							<a href="#/broadcast" class="nav-link router-link mr-md-2" data-route="broadcast" tkey="broadcast"></a>
+						</li>
+						<li class="nav-item">
+							<a href="#/settings" class="nav-link router-link mr-md-2" data-route="settings" tkey="settings"></a>
+						</li>
+						<li class="nav-item">
+							<a href="http://api.minersworld.org:4321" class="nav-link">API</a>
+						</li>
+						<li class="nav-item">
+							<a href="https://minersworldcoin.github.io" class="nav-link">Explorer</a>
+						</li>
+						<li class="nav-item">
+							<a href="https://minersworld.org" class="nav-link">Website</a>
+						</li>
+						<li class="nav-item dropdown" id="wallets">
+                            <a class="nav-link dropdown-toggle" href="#" id="wallets" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Wallets Info
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="wallets">
+                                <!-- <a class="dropdown-item" href="webwallet.html">Web Wallet</a> -->
+								<a class="dropdown-item" href="walletgen.html">Paper Wallet</a>
+                            </div>
+                        </li>
+						<li class="nav-item dropdown" id="peers">
+                            <a class="nav-link dropdown-toggle" href="#" id="peers" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Peer Info
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="peers">
+                                <a class="dropdown-item" href="peermap.html">PeersMap</a>
+								<a class="dropdown-item" href="peers.html">Peers</a>
+                                <a class="dropdown-item" href="addnodes.html">AddNodes</a>
+                            </div>
+                        </li>
+						<li class="nav-item dropdown" id="network-list">
+							<a class="nav-item nav-link dropdown-toggle" href="#" id="network-versions" data-toggle="dropdown">NETWORK</a>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions" ></div>
+						</li>
+						<li class="nav-item">
+							<button id="themeToggle" class="btn btn-sm nav-link" style="border:none;background:none;">
+								🌗
+							</button>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		
+		<!-- Error message and search -->
+		<div class="container">
+			<div id="error-message" class="alert alert-warning d-none" role="alert">
+				Error, yay ∠( ᐛ 」∠)
+			</div>
+		</div>
+	
+		<!-- Home page -->
+		<div id="homepage" class="router-page">
+			<div class="container">
+				<div id="open-block">
+					<div class="card mb-3">
+						<div class="card-header">
+							<ul class="nav nav-tabs card-header-tabs">
+								<li class="nav-item mr-2">
+									<a class="nav-link tab-link active" data-tab-name="open-regular" data-tab-family="open-block" href="#" tkey="open-regular"></a>
+								</li>
+								<li class="nav-item">
+									<a class="nav-link tab-link" data-tab-name="open-key" data-tab-family="open-block" href="#" tkey="open-key"></a>
+								</li>
+							</ul>
+						</div>
+						<div class="card-body">
+							<form id="open-regular-form" class="open-form tab-item" data-tab="open-regular">
+								<div class="input-group pb-2">
+									<input id="open-email" name="open-email" class="form-control" type="text" tkey="email-address">
+								</div>
+								<div class="input-group">
+									<input id="open-password" name="open-password" class="form-control" type="password" tkey="password">
+									<input id="open-password-confirm" name="open-password-confirm" class="form-control" type="password" tkey="password-confirm">
+									<div class="input-group-append">
+										<button class="btn btn-outline-dark b-width" type="submit" id="open-regular-wallet" tkey="open"></button>
+									</div>
+								</div>
+							</form>
+							<form id="open-key-form" class="open-form tab-item d-none" data-tab="open-key">
+								<div class="input-group">
+									<input id="passphrase" name="passphrase" class="form-control" type="password" tkey="wif-key">
+									<div class="input-group-append">
+										<button class="btn btn-outline-dark b-width" type="submit" id="open-key-wallet" tkey="open"></button>
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="card-footer">
+							<div class="footer-item tab-item" data-tab="open-regular" tkey="open-reminder">
+							</div>
+							<div class="footer-item tab-item d-none" data-tab="open-key">
+								<span tkey="generate-question"></span> <span tkey="generate-it"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div id="wallet-block" class="d-none">
+					<div class="card mb-3">
+						<div class="card-header">
+							<ul class="nav nav-tabs card-header-tabs">
+								<li class="nav-item mr-2">
+									<a class="nav-link tab-link active" data-tab-name="wallet-balance" data-tab-family="wallet-block" href="#" tkey="wallet"></a>
+								</li>
+								<li class="nav-item mr-2">
+									<a class="nav-link tab-link" data-tab-name="wallet-send" data-tab-family="wallet-block" href="#" tkey="send"></a>
+								</li>
+								<li class="nav-item mr-2">
+                                    <a id="history-link" class="nav-link" target="_blank" href="https://minersworldcoin.github.io/#/address/" tkey="address"></a>
+                                </li>
+                                <li class="nav-item mr-2">
+                                    <a class="nav-link tab-link" data-tab-name="wallet-history" data-tab-family="wallet-block" href="#" tkey="history"></a>
+                                </li>
+								<li class="nav-item">
+									<a class="nav-link tab-link" data-tab-name="wallet-keys" data-tab-family="wallet-block" href="#" tkey="keys"></a>
+								</li>
+							</ul>
+						</div>
+						<div class="card-body">
+							<div class="text-center">
+								<div class="tab-item" data-tab="wallet-balance">
+									<div id="qr-code-addres" class="qr-code"></div>
+									<div id="wallet-address"></div>
+									<div class="wallet-balance mb-0 pb-0 c-pointer">
+										<span class="text-monospace amount"></span>
+										<span class="ticker" tkey="loading"></span>
+									</div>
+									<div id="priceInfo" class="text-center mt-3">
+										<p>
+											<div id="priceStatus">
+											<span id="spinner" style="display:none;">🔄 Loading...</span>
+											</div>
+
+											<select id="currencySelect">
+											<option value="USD" selected>USD ($)</option>
+											<option value="EUR">EUR (€)</option>
+											<option value="GBP">GBP (£)</option>
+											<option value="AUD">AUD ($)</option>
+											<option value="CAD">CAD ($)</option>
+											<option value="BTC">BTC (₿)</option>
+											</select>
+										</p>
+										<p>
+											<span id="coinPriceLabel">Coin Price:</span>
+											<strong id="coinPrice">Loading...</strong>
+										</p>
+										<p>
+											<span id="totalValueLabel">Total Value:</span>
+											<strong id="totalValue">Loading...</strong>
+										</p>
+									</div>
+								</div>
+							</div>
+
+							<div id="wallet-send" class="tab-item d-none" data-tab="wallet-send">
+								<div class="mb-2">
+									<span class="">
+										<span tkey="available-balance"></span>
+										<b class="wallet-balance balance-small c-pointer">
+											<span class="amount"></span>
+											<span class="ticker" tkey="loading"></span>
+										</b>
+									</span>
+
+									<div class="float-md-right">
+										<a href="#" id="send-qr" class="text-dark pr-1">
+											<span tkey="scan-qr"></span>
+											<span class="entypo camera"></span>
+										</a>
+										<a href="#" id="send-reset" class="text-dark">
+											<span tkey="reset"></span>
+											<span class="entypo cycle"></span>
+										</a>
+									</div>
+								</div>
+								
+								<div id="send-outputs">
+									<div class="input-group send-outputs-item mb-2">
+										<input name="send-address" class="form-control" type="text" value="" tkey="enter-address">
+										<input name="send-ammount" class="form-control" type="text" value="" tkey="amount">
+										<div class="input-group-append">
+											<button id="add-output" class="btn btn-outline-dark">
+												<span class="entypo plus"></span>
+											</button>
+										</div>
+									</div>
+								</div>
+
+								<div class="input-group">
+									<input id="send-fee" class="form-control" placeholder="Fee" type="text" value="">
+									<div class="input-group-append">
+										<button class="btn btn-outline-dark b-width" type="submit" id="send-tx" tkey="send"></button>
+									</div>
+								</div>
+							</div>
+
+							<div class="tab-item d-none" data-tab="wallet-history">
+								<h5 class="mb-3">Transaction History</h5>
+									<div id="tx-history" class="table-responsive">
+										<table class="table table-striped table-bordered text-center">
+											<thead>
+												<tr>
+												<th>Tx Hash</th>
+												<th>Type</th>
+												<th>Amount (MWC)</th>
+												<th>Timestamp</th>
+												</tr>
+											</thead>
+											<tbody id="tx-history-body">
+												<!-- Rows injected here -->
+											</tbody>
+										</table>
+									</div>
+							</div>
+							
+							<div class="tab-item d-none" data-tab="wallet-keys">
+								<div id="wallet-keys">
+									<div id="wallet-keys-pubkey">
+										<label tkey="public-key"></label>
+										<div class="input-group pb-2">
+											<input class="form-control" readonly type="text">
+										</div>
+									</div>
+
+									<div id="wallet-keys-privkey">
+										<label tkey="private-key"></label>
+										<div class="input-group pb-2">
+											<div class="input-group">
+												<input class="form-control keys-privkey privkey" readonly data-original-title="" title="" type="password">
+												<span class="input-group-append">
+													<button class="btn btn-outline-dark b-width toggle-priv-key" type="button" tkey="show"></button>
+												</span>
+											</div>
+										</div>
+									</div>
+									
+									<div id="wallet-keys-script">
+										<label>Redeem Script <i>(SegWit)</i></label>
+										<div class="input-group pb-2">
+											<input class="form-control" readonly type="text">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="card-footer">
+							<button id="footer-close" type="button" class="btn btn-danger btn-block footer-item" tkey="close"></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Generate address -->
+		<div id="create" class="router-page">
+			<div class="container">
+				<div class="card mb-3">
+					<div class="card-header">
+						<b tkey="create-wallet"></b>
+					</div>
+					<div class="card-body">
+						<div id="create-keys">
+							<div id="create-keys-address">
+								<label tkey="address"></label>
+								<div class="input-group pb-2">
+									<input class="form-control" readonly type="text">
+								</div>
+							</div>
+
+							<div id="create-keys-pubkey">
+								<label tkey="public-key"></label>
+								<div class="input-group pb-2">
+									<input class="form-control" readonly type="text">
+								</div>
+							</div>
+
+							<div id="create-keys-privkey">
+								<label tkey="private-key"></label>
+								<div class="input-group pb-2">
+									<div class="input-group">
+										<input class="form-control keys-privkey privkey" readonly data-original-title="" title="" type="password">
+										<span class="input-group-append">
+											<button class="btn btn-outline-dark b-width toggle-priv-key" type="button" tkey="show"></button>
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card-footer">
+						<button id="footer-create" type="button" class="btn btn-primary btn-block footer-item" tkey="create"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Broadcast transaction -->
+		<div id="broadcast" class="router-page">
+			<div class="container">
+				<div class="card mb-3">
+					<div class="card-header">
+						<b tkey="broadcast-transaction"></b>
+					</div>
+					<div class="card-body">
+						<textarea class="form-control" id="transaction-broadcast-raw" rows="4" tkey="enter-transaction"></textarea>
+					</div>
+					<div class="card-footer">
+						<button id="footer-broadcast" type="button" class="btn btn-primary btn-block footer-item" tkey="broadcast"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Settings transaction -->
+		<div id="settings" class="router-page">
+			<div class="container">
+				<div class="card mb-3">
+					<div class="card-header">
+						<b tkey="wallet-settings"></b>
+					</div>
+					<div class="card-body">
+						<div id="address-type-select">
+							<label tkey="address-type"></label>
+							<div class="input-group pb-2">
+								<select class="custom-select">
+									<option>bech32</option>
+									<option>segwit</option>
+									<option>legacy</option>
+								</select>
+							</div>
+						</div>
+						<div id="wallet-backend">
+							<label tkey="wallet-backend"></label>
+							<div class="input-group pb-2">
+								<input class="form-control" type="text" tkey="wallet-api">
+								<span class="input-group-append">
+									<button class="btn btn-outline-dark b-width" type="button" tkey="update"></button>
+								</span>
+							</div>
+						</div>
+						<div id="wallet-language-select">
+							<label tkey="wallet-language"></label>
+							<div class="input-group">
+								<select class="custom-select"></select>
+							</div>
+						</div>
+					</div>
+					<div class="card-footer">
+						<span tkey="version"></span> <b id="wallet-version"></b>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="send-modal" class="modal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-md" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 id="send-title" class="modal-title"></h5>
+						<button id="send-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div id="confirm-screen">
+							<span tkey="send-warning"></span> <strong id="confirm-amount"></strong>. <span tkey="send-warning-reverse"></span>
+						</div>
+						<div id="status-screen" class="break-lines d-none">
+							<span></span>
+							<div class="progress mt-2">
+                                <div id="send-progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                            </div>
+                            <div class="status-list mt-2">
+                                <ul id="status-messages" style="list-style-type: none; padding-left: 0; font-size: 14px;"></ul>
+                            </div>
+							<div class="extra-info"></div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="send-cancel" type="button" class="btn btn-block mr-auto btn-dark" data-dismiss="modal" tkey="cancel"></button>
+						<button id="send-confirm" type="button" class="btn btn-block mt-0 mr-auto btn-primary" tkey="send-it"></button>
+						<button id="send-close-footer" type="button" class="btn btn-block mt-0 mr-auto btn-dark d-none disabled" data-dismiss="modal" tkey="close"></button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="scan-modal" class="modal" tabindex="-1" role="dialog">
+			<div class="modal-dialog modal-md" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" tkey="scan-modal-title"></h5>
+						<button id="scan-close" type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body">
+						<div id="loading-message">
+							
+						</div>
+						<canvas id="scan-canvas" hidden class="w-100"></canvas>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- <div class="disclaimer mb-3">
+			<div class="container text-center">
+				<small class="text-muted" style="max-width: 1100px;" tkey="disclaimer"></small>
+			</div>
+		</div> -->
+
+		<!-- Footer :3 -->
+		<footer class="mb-3">
+			<div class="container text-center text-light">
+
+				<div class="mb-2">
+				Made with ❤️ by
+				<a
+					target="_blank"
+					rel="noopener"
+					href="https://github.com/Miners-World-Coin-MWC"
+				>
+					MinersWorldCoin Team
+				</a>
+				</div>
+
+				<!-- Social links -->
+				<div class="social-links mt-3">
+				<a
+					href="https://discord.gg/5HZGx5bbKK"
+					target="_blank"
+					rel="noopener"
+					aria-label="Discord"
+				>
+					<i class="fab fa-discord"></i>
+				</a>
+
+				<a
+					href="https://t.me/+0IfF9E76ETZiNDQ8"
+					target="_blank"
+					rel="noopener"
+					aria-label="Telegram"
+				>
+					<i class="fab fa-telegram"></i>
+				</a>
+
+				<a
+					href="https://www.reddit.com/r/MinersWorldCoin/"
+					target="_blank"
+					rel="noopener"
+					aria-label="Reddit"
+				>
+					<i class="fab fa-reddit"></i>
+				</a>
+
+				<a
+					href="https://x.com/minerworldcoin"
+					target="_blank"
+					rel="noopener"
+					aria-label="X"
+				>
+					<i class="fab fa-x-twitter"></i>
+				</a>
+				</div>
+
+			</div>
+		</footer>
+
+		<!-- All magic is here :D -->
+		<script src="js/toggle.js"></script>
+		<script>
+			// Config
+			var stream = undefined
+			var walletTimer = false
+			var walletVersion = '0.1'
+			var networkConfigs = {
+				'MWC': {
+					'uri': 'MinersWorldCoin:',
+					'title': 'MWC Wallet',
+					'name': 'Main Network (MWC)',
+					'api': 'http://api.minersworld.org:4321',
+					'ticker': 'MWC',
+					'decimals': 8,
+					'fee': 0.00001,
+					'network': {
+						'messagePrefix': '\x19MinersWorldCoin Signed Message:\n',
+						'bip32': {
+							'public': 0x0488b21e,
+							'private': 0x0488ade4
+						},
+						'bech32': 'tmwc',
+						'pubKeyHash': 0x14,
+						'scriptHash': 0x0A,
+						'wif': 0x7B
+					}
+				},
+				'TMWC': {
+					'uri': 'MinersWorldCoin:',
+					'title': 'MWC Wallet',
+					'name': 'Test Network (TMWC)',
+					'api': 'http://api.minersworld.org:4321',
+					'ticker': 'TMWC',
+					'decimals': 8,
+					'fee': 0.00001,
+					'network': {
+						'messagePrefix': '\x19MinersWorldCoin Signed Message:\n',
+						'bip32': {
+							'public': 0x043587cf,
+							'private': 0x04358394
+						},
+						'bech32': 'tmwc',
+						'pubKeyHash': 0x53,
+						'scriptHash': 0xC5,
+						'wif': 0xF0
+					}
+				},
+				
+			}
+
+			// Explorer links
+			var blockExplorer = {
+				'address': function(address) {
+					return 'https://minersworldcoin.github.io/#/address/' + address + '/' + getConfig()['ticker']
+				},
+				'tx': function(tx) {
+					return 'https://minersworldcoin.github.io/#/transaction/' + tx + '/' + getConfig()['ticker']
+				}
+			}
+
+			var globalData = {
+				'balance': 0,
+				'keys': undefined,
+				'address': undefined,
+				'rfee': getConfig()['fee'],
+				'tx': {
+					'amount': 0,
+					'outputs': [],
+					'fee': 0
+				},
+				'resetTx': function() {
+					this.tx = {
+						'amount': 0,
+						'outputs': [],
+						'fee': 0
+					}
+				},
+				'clear': function() {
+					this.keys = {}
+					this.address = ''
+					this.balance = 0
+					this.resetTx()
+				}
+			}
+
+			// --- Price Fetching + Total Value ---
+			async function fetchFromCoinPaprika(currency = "USD") {
+				try {
+					const response = await fetch('https://api.coinpaprika.com/v1/tickers/mwc-minersworldcoin');
+					const data = await response.json();
+					console.log('CoinPaprika data:', data);
+					const price = Number(data?.quotes?.[currency]?.price);
+					if (!isNaN(price)) return price;
+					throw new Error("Invalid price from CoinPaprika.");
+				} catch (err) {
+					console.warn("CoinPaprika failed:", err);
+					return null;
+				}
+			}
+
+			async function fetchFromLiveCoinWatch(currency = "USD") {
+				try {
+					const response = await fetch("https://api.livecoinwatch.com/coins/single", {
+						method: "POST",
+						headers: {
+							"content-type": "application/json",
+							"x-api-key": window.LCW_API_KEY || "9d7d070a-a798-4a0e-a8ec-e0391b5392c9",
+						},
+						body: JSON.stringify({
+							currency,
+							code: "MWC",
+							meta: true,
+						}),
+					});
+
+					const data = await response.json();
+					console.log('LiveCoinWatch data:', data);
+					const price = Number(data?.rate);
+					if (!isNaN(price)) return price;
+					throw new Error("Invalid price from LiveCoinWatch.");
+				} catch (err) {
+					console.error("LiveCoinWatch failed:", err);
+					return null;
+				}
+			}
+
+			function fetchWalletTxHistory() {
+				if (!globalData.address) return;
+
+				const historyUrl = `http://api.minersworld.org:4321/history/${globalData.address}`;
+				const txBody = document.getElementById('tx-history-body');
+				txBody.innerHTML = '';
+				const loadingRow = document.createElement('tr');
+				loadingRow.innerHTML = '<td colspan="4">Loading...</td>';
+				txBody.appendChild(loadingRow);
+
+				fetch(historyUrl)
+					.then(response => {
+						if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+						return response.json();
+					})
+					.then(async data => {
+						const txList = data.result && Array.isArray(data.result.tx) ? data.result.tx : [];
+
+						if (txList.length === 0) {
+							txBody.innerHTML = '<tr><td colspan="4">No transaction history found.</td></tr>';
+							return;
+						}
+
+						txBody.innerHTML = '';
+
+						for (const txid of txList) {
+							try {
+								const txResponse = await fetch(`http://api.minersworld.org:4321transaction/${txid}`);
+								if (!txResponse.ok) throw new Error(`TX fetch failed: ${txid}`);
+								const txData = await txResponse.json();
+								const tx = txData.result;
+
+								let received = 0;
+								let sent = 0;
+								const address = globalData.address;
+
+								// Add up vout (received)
+								for (const out of tx.vout || []) {
+									const addresses = out.scriptPubKey?.addresses || [];
+									if (addresses.includes(address)) {
+										received += out.value / 1e8;
+									}
+								}
+
+								// Add up vin (sent)
+								for (const input of tx.vin || []) {
+									const addresses = input.scriptPubKey?.addresses || [];
+									if (addresses.includes(address)) {
+										sent += input.value / 1e8;
+									}
+								}
+
+								const netAmount = received - sent;
+								const txType = netAmount > 0 ? 'Received' : netAmount < 0 ? 'Sent' : 'Neutral';
+								const amountColor = netAmount > 0 ? 'green' : netAmount < 0 ? 'red' : 'gray';
+
+								const dateStr = new Date(tx.time * 1000).toLocaleString(undefined, {
+									year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+								});
+
+								// console.log("TXID:", tx.txid);
+								// console.log("Sent:", sent, "Received:", received, "Net:", netAmount);
+								// console.log("Row added to DOM:", row);
+
+
+								const row = document.createElement('tr');
+								row.innerHTML = `
+									<td><a href="https://minersworldcoin.github.io/#/transaction/${tx.txid}" target="_blank">${tx.txid.slice(0, 12)}...</a></td>
+									<td><span class="badge badge-${txType === 'Received' ? 'success' : txType === 'Sent' ? 'danger' : 'secondary'}">${txType}</span></td>
+									<td style="color:${amountColor}">${netAmount.toLocaleString(undefined, {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 8
+									})}</td>
+									<td>${dateStr}</td>
+								`;
+
+								txBody.appendChild(row);
+							} catch (err) {
+								console.error(`Failed to fetch TX detail for ${txid}:`, err);
+							}
+						}
+					})
+					.catch(error => {
+						console.error('Error fetching transaction history:', error);
+						txBody.innerHTML = '<tr><td colspan="4">Failed to load transaction history.</td></tr>';
+					});
+			}
+
+
+			function formatCurrency(value, currency = "USD") {
+				const fractionDigits = currency === "BTC" ? 8 : 8;
+				return new Intl.NumberFormat('en-US', {
+					style: 'currency',
+					currency,
+					minimumFractionDigits: fractionDigits,
+					maximumFractionDigits: fractionDigits
+				}).format(value);
+			}
+
+			async function updatePriceAndValue() {
+				const spinner = document.getElementById('spinner');
+				if (spinner) spinner.style.display = 'inline';
+
+				try {
+					const currency = document.getElementById('currencySelect')?.value || 'USD';
+
+					let price = await fetchFromCoinPaprika(currency);
+					if (price === null) price = await fetchFromLiveCoinWatch(currency);
+					if (price === null) throw new Error("Both APIs failed.");
+
+					const balance = parseFloat(globalData.balance) / 1e8;
+					if (isNaN(balance)) throw new Error("Invalid globalData.balance");
+
+					const formattedPrice = formatCurrency(price, currency);
+					const totalValue = formatCurrency(balance * price, currency);
+
+					if (document.getElementById('coinPrice')) document.getElementById('coinPrice').textContent = formattedPrice;
+					if (document.getElementById('totalValue')) document.getElementById('totalValue').textContent = totalValue;
+
+				} catch (err) {
+					console.error('Error fetching price or calculating total value:', err);
+					if (document.getElementById('coinPrice')) document.getElementById('coinPrice').textContent = 'N/A';
+					if (document.getElementById('totalValue')) document.getElementById('totalValue').textContent = 'N/A';
+				} finally {
+					if (spinner) spinner.style.display = 'none';
+				}
+			}
+
+			// Optional: call updatePriceAndValue() after loading balance
+			// Example: after you fetch and assign `globalData.balance`, call:
+			// updatePriceAndValue();
+
+			// Messages
+			var messages = initMessages()
+
+			function initMessages() {
+				return {
+					'settings': {
+						'typeSwitched': function (type) {
+							return getText('address-type-changed') + ' <b>' + type + '</b>'
+						},
+						'backendSwitched': function (url) {
+							return getText('backend-switched') + ' <b>' + url + '</b>'
+						},
+						'backendNotWorking': function (url) {
+							return '<b>' + url + '</b> ' + getText('backend-down')
+						}
+					},
+					'error': {
+						'bad-utxo': getText('bad-utxo'),
+						'balance-load-failed': getText('balance-load-failed'),
+						'not-enough-funds': getText('not-enough-funds'),
+						'not-valid-address': getText('not-valid-address'),
+						'not-valid-amount': getText('not-valid-amount'),
+						'not-valid-fee': getText('not-valid-fee'),
+						'bad-priv-key': getText('bad-priv-key'),
+						'not-enough-utxo': getText('not-enough-utxo'),
+						'broadcast-failed': getText('broadcast-failed'),
+						'pass-not-match': getText('pass-not-match'),
+						'pass-too-short': getText('pass-too-short'),
+						'bad-email': getText('bad-email'),
+						'small-fee': getText('small-fee') + ' ' + getConfig()['fee'] + ' ' + getConfig()['ticker'] + '!'
+					},
+					'tx': {
+						'loading-utxo': getText('loading-utxo'),
+						'generating': getText('transaction-creation'),
+						'success': getText('transaction-broadcasted'),
+					},
+					'title': {
+						'sure': getText('send-sure'),
+						'processing': getText('send-processing'),
+						'success': getText('success'),
+						'failed': getText('failed')
+					},
+					'misc': {
+						'outputAdded': function (address) {
+							return getText('address') + ' ' + '<b class="break-word">' + address + '</b>' + ' ' + getText('outputs-added')
+						}
+					}
+				}
+			}
+
+			function initLang() {
+				var language = readCookie('language')
+				var set_lang = 'en'
+
+				if (language == null || walletLanguages[language] == undefined) {
+					var user_lang = navigator.language.substr(0, 2)
+					if (user_lang in walletLanguages) {
+						set_lang = user_lang
+					}
+
+					setCookie('language', set_lang, 60)
+					language = readCookie('language')
+				}
+
+				$('#wallet-language-select select').empty()
+				for (key in walletLanguages) {
+					$('#wallet-language-select select').append($('<option>', {
+						'value': key,
+						'text': walletLanguages[key]['lang-alias']
+					}))
+				}
+
+				$('#wallet-language-select select').val(language)
+				$("[tkey]").each(function() {
+					if (['INPUT', 'TEXTAREA'].indexOf($(this).prop('tagName')) >= 0) {
+						$(this).attr('placeholder', getText($(this).attr('tkey')))
+					} else {
+						$(this).html(getText($(this).attr('tkey')))
+					}
+				})
+
+				messages = initMessages()
+				setTitle(getText('wallet-settings'))
+				return language
+			}
+
+			// Get current wallet language translation token
+			function getText(token) {
+				var language = readCookie('language')
+				if (language == undefined) {
+					language = initLang()
+				}
+
+				if (token in walletLanguages[language]) {
+					return walletLanguages[language][token]
+				} else {
+					return walletLanguages['en'][token]
+				}
+			}
+
+			// Get current network config
+			function getConfig() {
+				var network = readCookie('network')
+				if (network == null || networkConfigs[network] == undefined) {
+					setCookie('network', Object.keys(networkConfigs)[0], 60)
+					network = readCookie('network')
+				}
+
+				return networkConfigs[network]
+			}
+
+			// Switch network
+			function switchConfig(network, page = '') {
+				network = network.toUpperCase()
+				if (networkConfigs[network] != undefined & networkConfigs[network] != getConfig()) {
+					setCookie('network', network, 60)
+					closeWallet()
+					displayNetworks()
+					switchBackend(networkConfigs[network]['api'])
+				}
+
+				switchPage(page)
+			}
+
+			// Display networks list
+			function displayNetworks() {
+				network = getConfig()
+				$('#network-versions').text(network['name'])
+				$('#network-list .dropdown-menu').empty()
+
+				for (var key in networkConfigs) {
+					$('#network-list .dropdown-menu').append(`<a class="dropdown-item ${networkConfigs[key]['name'] == network['name'] ? 'active' : ''}" href="#/network/${key}">${networkConfigs[key]['name']}</a>`)
+				}
+			}
+
+			// Get current address type
+			function getAddressType() {
+				var type = readCookie('type')
+				if (type == null || !['bech32', 'segwit', 'legacy'].includes(type)) {
+					setCookie('type', 'bech32', 60)
+					type = readCookie('type')
+				}
+
+				return type
+			}
+
+			// Switch address type
+			function switchAddressType(type) {
+				if (['bech32', 'segwit', 'legacy'].includes(type)) {
+					setCookie('type', type, 60)
+				}
+			}
+
+			// Get current wallet backend
+			function getBackend() {
+				var backend = readCookie('backend')
+				if (backend == null) {
+					setCookie('backend', getConfig()['api'], 60)
+					backend = readCookie('backend')
+				}
+
+				return backend
+			}
+
+			// Switch wallet backend
+			function switchBackend(url) {
+				Promise.resolve($.ajax({
+					'url': url + '/info',
+				})).then(function(data) {
+					setCookie('backend', url, 60)
+					showMessage(messages.settings.backendSwitched(url))
+				}).catch(function() {
+					showMessage(messages.settings.backendNotWorking(url))
+					$('#wallet-backend input').val(getBackend())
+				})
+			}
+
+			// Set cookie
+			function setCookie(name, value, days) {
+				var expires
+
+				if (days) {
+					var date = new Date();
+					date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+					expires = '; expires=' + date.toGMTString();
+				} else {
+					expires = '';
+				}
+				document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) + expires + '; path=/';
+			}
+
+			// Read cookie
+			function readCookie(name) {
+				var nameEQ = encodeURIComponent(name) + '=';
+				var ca = document.cookie.split(';');
+				for (var i = 0; i < ca.length; i++) {
+					var c = ca[i];
+					while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+					if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+				}
+				return null;
+			}
+
+			function deleteCookie(name) {
+				document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+			}
+
+			// SPA router function
+			function routePage() {
+				var urlParams = readParams()
+				if (window.location.hash == '') {
+					window.location.replace(window.location.href.split('#')[0] + '#/')
+				}
+
+				if (urlParams[0] == '#') {
+					var pageName = urlParams[1] != '' ? urlParams[1] : 'homepage'
+					var templateName = '#' + pageName
+						
+					$('.router-link').removeClass('active')
+					$('.router-link[data-route=' + pageName + ']').addClass('active')
+					if ($('.router-page:visible').attr('id') != urlParams[1]) {
+						$('div.router-page').hide()
+						if ($(templateName).length) {
+							$(templateName).show()
+						}
+					}
+
+					switch(pageName) {
+						// Home page ¯\_(ツ)_/¯
+						case 'homepage':
+							setHomeTitle()
+							break
+
+						case 'create':
+							setTitle(getText('create-wallet'))
+							break
+
+						case 'broadcast':
+							setTitle(getText('broadcast-transaction'))
+							break
+
+						case 'settings':
+							setTitle(getText('wallet-settings'))
+							break
+
+						// Switch network
+						case 'network':
+							network = urlParams[2]
+							if (network != undefined) {
+								switchConfig(network)
+							}
+
+							break
+
+						default:
+							switchPage()
+
+							break
+					}
+				}
+			}
+
+			// Switch router page
+			function switchPage(url = '', params = []) {
+				params = params.length > 0 ? '/' + params.join('/') : ''
+				window.location.hash = '#' + '/' + url + params;
+			}
+
+			// Read URL params
+			function readParams() {
+				return window.location.hash.split('/')
+			}
+
+			// Set window title
+			function setTitle(title) {
+				document.title = title + ' | ' + getConfig()['title'];
+			}
+
+			// Broadcast tx
+			function transactionBroadcast(rawtx) {
+				return Promise.resolve($.ajax({
+					'method': 'POST',
+					'url': getBackend() + '/broadcast',
+					'data': {
+						'raw': rawtx
+					}
+				}))
+			}
+
+			// Estimate fee
+			function estimateFee() {
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/fee',
+				})).then(function(data) {
+					return data
+				})
+			}
+
+			// Get address balance
+			function addressBalance(address) {
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/balance/' + address,
+				})).then(function(data) {
+					return data
+				})
+			}
+
+			// Get address UTXO
+			function getUnspent(address, amount) {
+				
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/unspent/' + address + '?amount=' + amount,
+				})).then(function(data) {
+					return data
+				})
+			}
+
+			// Get transaction info
+			function transactionInfo(hash) {
+				return Promise.resolve($.ajax({
+					'url': getBackend() + '/transaction/' + hash,
+				})).then(function(data) {
+					return data
+				})
+			}
+
+			// Convert satoshis to readable amount
+			function amountFormat(amount, invert = false) {
+				var decimals = getConfig()['decimals']
+				if (!invert) {
+					return parseFloat((amount / Math.pow(10, decimals)).toFixed(decimals))
+				} else {
+					return parseInt(amount * Math.pow(10, decimals))
+				}
+			}
+
+			// Show big error message at the top of the page :D 
+			function showMessage(message) {
+				$('#error-message').html(message)
+				$('#error-message').removeClass('d-none')
+				setTimeout(function() {
+					$('#error-message').addClass('d-none')
+				}, 3400);
+			}
+
+			function showQrAddress(text) {
+				$('#qr-code-addres').empty()
+				$('#qr-code-addres').qrcode(text)
+			}
+
+			/* Wallet functions */
+
+			// Check wallet balance
+			function walletBalance() {
+				var balance = '0.00';
+				$('.wallet-balance .amount').text('');
+				$('.wallet-balance .ticker').text(getText('loading'));
+
+				addressBalance(globalData.address).then(function(data) {
+					if (data['error'] == undefined) {
+						globalData.balance = data.result.balance;
+						balance = amountFormat(globalData.balance);
+					} else {
+						showMessage(messages.errors['balance-load-failed']);
+					}
+
+					$('.wallet-balance .amount').text(balance);
+					$('.wallet-balance .ticker').text(getConfig()['ticker']);
+
+					// ✅ Update price & value once balance is set
+					updatePriceAndValue();
+				});
+			}
+
+			// Set title
+			function setHomeTitle() {
+				if (globalData.keys != undefined) {
+					setTitle(getText('address') + ' ' + globalData.address)
+				} else {
+					setTitle(getText('open-wallet'))
+				}
+			}
+
+			// Check balance
+			function checkBalanceLoop() {
+				clearTimeout(walletTimer);
+				walletTimer = setTimeout(function() {
+					if ($('.wallet-balance .ticker').text() != getText('loading')) {
+						walletBalance()
+					}
+					checkBalanceLoop()
+				}, 20000)
+			}
+
+			// Open wallet by key
+			function openWallet(keys) {
+				globalData.address = getAddress(keys)
+				var pubkey = keys.publicKey.toString('hex')
+				var wif = keys.toWIF()
+				var redeem = '0014' + getP2WPKHScript(keys.publicKey).hash.toString('hex')
+
+				$('#wallet-keys-pubkey input').val(pubkey)
+				$('#wallet-keys-privkey input').val(wif)
+				$('#wallet-keys-script input').val(redeem)
+				
+				$('#wallet-address').html(globalData.address)
+				$('#open-block').addClass('d-none')
+				$('#wallet-block').removeClass('d-none')
+				$('#history-link').attr('href', blockExplorer.address(globalData.address))
+				$('#send-fee').attr('placeholder', getText('fee') + ' (' + getText('recommended') + ' ' + globalData.rfee + ' ' + getConfig()['ticker'] + ')')
+				showQrAddress(getConfig()['uri'] + globalData.address)
+
+				// Init wallet stuffs
+				walletBalance()
+				checkBalanceLoop()
+				setHomeTitle()
+			}
+
+			function showConfirmation(amount) {
+				$('#confirm-amount').text(amount + ' ' + getConfig()['ticker'])
+				$('#send-modal').modal('toggle')
+				$('#send-title').text(messages.title['sure'])
+				$('#send-cancel').removeClass('disabled')
+				$('#send-confirm').removeClass('disabled')
+				$('#send-cancel').removeClass('d-none')
+				$('#send-confirm').removeClass('d-none')
+				$('#send-close-footer').addClass('d-none')
+				$('#send-close-footer').addClass('disabled')
+				$('#confirm-screen').removeClass('d-none')
+				$('#status-screen').addClass('d-none')
+				$('#status-screen span').html('')
+
+				$.each($('#send-outputs .send-outputs-item'), function(key, item) {
+					var address = $('[name="send-address"]', item).val().trim()
+					var value = $('[name="send-ammount"]', item).val() * 1
+					globalData.tx.outputs.push({
+						'address': address,
+						'amount': amountFormat(value, true)
+					})
+				})
+
+				globalData.tx.amount = amountFormat(amount, true)
+				globalData.tx.fee = amountFormat(($('#send-fee').val() != '') ? $('#send-fee').val() : globalData.rfee, true)
+			}
+
+			function stopStream() {
+				if (stream != undefined) {
+					stream.getTracks().forEach(function(track) {
+						track.stop()
+					})
+				}
+			}
+
+			function startStream() {
+				var canvasElement = document.getElementById('scan-canvas')
+				var canvas = canvasElement.getContext('2d')
+				var video = document.createElement('video')
+				canvasElement.hidden = true
+
+				$('#loading-message').text(getText('webcam-message'))
+				$('#loading-message').removeClass('d-none')
+
+				// Use facingMode: environment to attempt to get the front camera on phones
+				navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(gstream) {
+					stream = gstream
+					video.srcObject = stream
+					video.setAttribute("playsinline", true)
+					video.play()
+					requestAnimationFrame(tick)
+				})
+
+				function tick() {
+					$('#loading-message').text(getText('webcam-loading'))
+					var stop = false
+					if (video.readyState === video.HAVE_ENOUGH_DATA) {
+						$('#loading-message').addClass('d-none')
+						canvasElement.hidden = false
+
+						canvasElement.height = video.videoHeight
+						canvasElement.width = video.videoWidth
+						canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height)
+						var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height)
+						var code = jsQR(imageData.data, imageData.width, imageData.height, {
+							inversionAttempts: "dontInvert",
+						})
+						
+						if (code) {
+							var address = code.data
+							if (address.startsWith(getConfig()['uri'])) {
+								address = address.replace(getConfig()['uri'], '')
+							}
+
+							if (validateAddress(address)) {
+								if ($('#send-outputs input[name="send-address"]').last().val() != '') {
+									$('#add-output').click()
+								}
+
+								$('#send-outputs input[name="send-address"]').last().val(address)
+								showMessage(messages.misc.outputAdded(address))
+								stop = true
+							}
+						}
+					}
+
+					if (!stop) {
+						requestAnimationFrame(tick)
+					} else {
+						$('#scan-modal').modal('toggle')
+						stopStream()
+					}
+				}
+			}
+
+			function showScanModal() {
+				$('#scan-modal').modal('toggle')
+				startStream()
+			}
+
+			function sendTransaction() {
+				var network = getConfig()['network']
+				var keys = globalData.keys
+
+				var decimals = getConfig()['decimals']
+				var outputs = globalData.tx.outputs
+				var amount = globalData.tx.amount
+				var address = globalData.address
+
+				var hashType = bitcoin.Transaction.SIGHASH_ALL
+				var scripts = []
+
+				var txb = new bitcoin.TransactionBuilder(network)
+				txb.setVersion(2)
+
+				$('#send-cancel').addClass('disabled')
+				$('#send-confirm').addClass('disabled')
+				$('#confirm-screen').addClass('d-none')
+				$('#status-screen').removeClass('d-none')
+				$('#send-title').text(messages.title['processing'])
+				$('#status-screen .extra-info').empty()
+				$('#status-screen span').html(messages.tx['generating'])
+				$('#send-progress-bar').css('width', '10%').attr('aria-valuenow', 10).text('10%');
+                $('#status-messages').append('<li>Progress: 10% - Transaction builder initialized</li>');
+				console.log('Progress: 10% - Transaction builder initialized');
+
+				// Step 1: Add outputs (20%)
+				for (var i = 0, size = outputs.length; i < size; i++) {
+					txb.addOutput(outputs[i].address, outputs[i].amount)
+				}
+				$('#send-progress-bar').css('width', '20%').attr('aria-valuenow', 20).text('20%');
+                $('#status-messages').append('<li>Progress: 20% - Outputs added</li>');
+                console.log('Progress: 20% - Outputs added');
+
+				// Step 2: Load UTXOs (40%)
+				$('#status-screen span').html(messages.tx['loading-utxo'])
+				getUnspent(address, amount).then(function(data) {
+					var size = data.result.length;
+                    $('#send-progress-bar').css('width', '40%').attr('aria-valuenow', 40).text('40%');
+                    $('#status-messages').append('<li>Progress: 40% - ' + size + ' UTXOs loaded</li>');
+					console.log('Progress: 40% - UTXOs loaded');
+					var value = 0
+					for (var i = 0, size = data.result.length; i < size; i++) {
+						$('#status-messages').append('<li>Checking UTXO ' + i + ' : ' + data.result[i].value + '</li>');
+						var txid = data.result[i].txid
+						var index = data.result[i].index
+						value += data.result[i].value
+
+						var script = bitcoin.Buffer(data.result[i].script, 'hex')
+						var type = getScriptType(script)
+
+						if (type == 'bech32') {
+							var p2wpkh = getP2WPKHScript(keys.publicKey)
+							txb.addInput(txid, index, null, p2wpkh.output)
+						} else {
+							txb.addInput(txid, index)
+						}
+
+						scripts.push({
+							'script': script,
+							'type': type,
+							'value': data.result[i].value
+						})
+					}
+
+					// Step 3: Inputs added (60%)
+                    $('#send-progress-bar').css('width', '60%').attr('aria-valuenow', 60).text('60%');
+                    $('#status-messages').append('<li>Progress: 60% - Inputs added</li>');
+                    console.log('Progress: 60% - Inputs added');
+
+					if (value >= amount) {
+						var change = value - amount
+						if (change > 0) {
+							$('#status-messages').append('<li>Change added: ' + change + '</li>');
+							txb.addOutput(address, change)
+						}
+
+					// Step 4: Change output processed (70%)
+                        $('#send-progress-bar').css('width', '70%').attr('aria-valuenow', 70).text('70%');
+                        $('#status-messages').append('<li>Progress: 70% - Change output processed</li>');
+                        console.log('Progress: 70% - Change output processed');
+
+						for (var i = 0, size = scripts.length; i < size; i++) {
+							switch (scripts[i].type) {
+								case 'bech32':
+									var value = scripts[i].value
+									txb.sign(i, keys, null, null, value, null)
+									break
+
+								case 'segwit':
+									var value = scripts[i].value
+									var redeem = getP2WPKHScript(keys.publicKey)
+									var p2sh = getP2SHScript(redeem)
+
+									txb.sign(i, keys, p2sh.redeem.output, null, value, null)
+									break
+
+								case 'legacy':
+									txb.sign(i, keys);
+									break
+
+								default:
+									showMessage(messages.error['bad-utxo'])
+									$('#send-progress-bar').css('width', '0%').attr('aria-valuenow', 0).text('0%');
+                                    $('#status-messages').append('<li>Progress: Reset to 0% - Bad UTXO</li>');
+                                    console.log('Progress: Reset to 0% - Bad UTXO');
+									break
+							}
+						}
+
+						// Step 5: Transaction signed (80%)
+                        $('#send-progress-bar').css('width', '80%').attr('aria-valuenow', 80).text('80%');
+                        $('#status-messages').append('<li>Progress: 80% - Transaction signed</li>');
+                        console.log('Progress: 80% - Transaction signed');
+
+						var tx = txb.build();
+
+						// Step 6: Broadcasting transaction (90%)
+                        $('#send-progress-bar').css('width', '90%').attr('aria-valuenow', 90).text('90%');
+                        $('#status-messages').append('<li>Progress: 90% - Broadcasting transaction</li>');
+                        console.log('Progress: 90% - Broadcasting transaction');
+
+						transactionBroadcast(tx.toHex()).then(function(data) {
+							if (data.error == undefined) {
+								$('#status-screen span').html(`
+									<a href="${blockExplorer.tx(data.result)}" target="_blank">
+										${data.result}
+									</a> 
+								`)
+								$('#send-title').text(messages.title['success'])
+								$('#send-progress-bar').css('width', '100%').attr('aria-valuenow', 100).text('100%');
+                                $('#status-messages').append('<li>Progress: 100% - Transaction broadcasted successfully</li>');
+                                console.log('Progress: 100% - Transaction broadcasted successfully');
+							} else {
+								$('#status-screen span').html(messages.error['broadcast-failed'])
+								$('#send-title').text(messages.title['failed'])
+								$('#status-screen .extra-info').html(`
+									<div class="mt-3">
+										<textarea class="form-control" readonly cols="30" rows="10">${data.error.message}</textarea>
+									</div>
+								`)
+								$('#send-progress-bar').css('width', '0%').attr('aria-valuenow', 0).text('0%');
+                                $('#status-messages').append('<li>Progress: Reset to 0% - Broadcast failed</li>');
+                                console.log('Progress: Reset to 0% - Broadcast failed');
+							}
+							resetTxForm()
+						})
+
+						$('#send-cancel').addClass('d-none')
+						$('#send-confirm').addClass('d-none')
+						$('#send-close-footer').removeClass('d-none')
+						$('#send-close-footer').removeClass('disabled')
+
+					} else {
+						showMessage(messages.error['not-enough-funds'])
+					}
+				})
+			}
+
+			// Close wallet
+			function closeWallet() {
+				$('#open-block').removeClass('d-none')
+				$('#wallet-block').addClass('d-none')
+				globalData.clear()
+				setHomeTitle()
+			}
+
+			function getScriptType(script) {
+				var type = undefined
+
+				if (script[0] == bitcoin.opcodes.OP_0 &&
+					script[1] == 20) {
+					type = 'bech32'
+				}
+
+				if (script[0] == bitcoin.opcodes.OP_HASH160 &&
+					script[1] == 20) {
+					type = 'segwit'
+				}
+
+				if (script[0] == bitcoin.opcodes.OP_DUP &&
+					script[1] == bitcoin.opcodes.OP_HASH160 &&
+					script[2] == 20) {
+					type = 'legacy'
+				}
+
+				return type
+			}
+
+			function getP2SHScript(redeem) {
+				return bitcoin.payments.p2sh({
+					'redeem': redeem,
+					'network': getConfig()['network']
+				})
+			}
+
+			function getP2WPKHScript(pubkey) {
+				return bitcoin.payments.p2wpkh({
+					'pubkey': pubkey,
+					'network': getConfig()['network']
+				})
+			}
+
+			function getAddress(keys) {
+				var network = getConfig()['network']
+				var address = undefined
+
+				if (getAddressType() == 'bech32') {
+					address = bitcoin.payments.p2wpkh({
+						'pubkey': keys.publicKey,
+						'network': network
+					}).address
+				} else if (getAddressType() == 'segwit') {
+					address = bitcoin.payments.p2sh({
+						'redeem': getP2WPKHScript(keys.publicKey),
+						'network': network
+					}).address
+				} else if (getAddressType() == 'legacy') {
+					address = bitcoin.payments.p2pkh({
+						'pubkey': keys.publicKey,
+						'network': getConfig()['network']
+					}).address
+				}
+
+				return address
+			}
+
+			function validateAddress(address) {
+				var network = getConfig()['network']
+
+				try {
+					bitcoin.address.fromBase58Check(address, network)
+					return true
+				} catch (e) {
+					try {
+						bitcoin.address.fromBech32(address, network)
+						return true
+					} catch (e) {
+						return false
+					}
+				}
+			}
+
+			// Create new wallet
+			$('#footer-create').click(function() {
+				var keys = bitcoin.ECPair.makeRandom({'network': getConfig()['network']})
+				var address = getAddress(keys)
+
+				if (address != undefined) {
+					$('#create-keys-address input').val(address)
+					$('#create-keys-pubkey input').val(keys.publicKey.toString('hex'))
+					$('#create-keys-privkey input').val(keys.toWIF())
+				}
+			})
+
+			// Broadcast raw transaction
+			$('#footer-broadcast').click(function(){
+				var rawtx = $('#transaction-broadcast-raw')
+				transactionBroadcast(rawtx.val()).then(function(data) {
+					if (data.error == undefined) {
+						showMessage(`
+							${messages.tx['success']}<a href="` + blockExplorer.tx(data.result) + `" target="_blank">` + data.result + `</a>
+						`)
+					} else {
+						showMessage(messages.error['broadcast-failed'])
+					}
+				})
+				rawtx.val('')
+			})
+
+			// Reset sending form
+			function resetTxForm() {
+				$('.send-additional-output').remove()
+				$('#wallet-send input').val('')
+				$('#send-progress-bar').css('width', '0%').attr('aria-valuenow', 0).text('0%')
+				globalData.resetTx()
+			}
+
+			function initWallet() {
+				// Open only if key is valid
+				if (globalData.keys != undefined) {
+					openWallet(globalData.keys)
+				}
+			}
+
+			// All starts here
+			$(document).ready(function() {
+				initLang()
+
+				$('#wallet-version').text(walletVersion)
+				$('#wallet-backend input').val(getBackend())
+				$('#address-type-select select').val(getAddressType());
+
+				displayNetworks()
+				routePage()
+
+				$('.tab-link').click(function(e) {
+					var tabFamily = $(this).data('tab-family')
+					var tabName = $(this).data('tab-name')
+
+					$('#' + tabFamily + ' .tab-item').addClass('d-none')
+					$('#' + tabFamily + ' .card-header .card-header-tabs .nav-link').removeClass('active')
+				
+					$('#' + tabFamily + ' [data-tab=' + tabName + ']').removeClass('d-none')
+					$(this).addClass('active')
+					
+					e.preventDefault()
+				})
+
+				$(window).on('hashchange', routePage)
+				if (window.location.hash) {
+					$(window).trigger('hashchange')
+				}
+
+				$('#send-tx').click(function() {
+					var error = false
+					var txFee = ($('#send-fee').val() != '') ? $('#send-fee').val() : globalData.rfee
+					var total = 0
+
+					if ((isNaN(txFee)) || txFee <= 0) {
+						showMessage(messages.error['not-valid-fee'])
+						error = true
+					} else {
+						if (txFee < getConfig()['fee']) {
+							showMessage(messages.error['small-fee'])
+							error = true
+						}
+					}
+
+					$.each($('#send-outputs .send-outputs-item'), function(key, item) {
+						var address = $('[name="send-address"]', item).val().trim()
+						var amount = $('[name="send-ammount"]', item).val()
+
+						if ((isNaN(amount)) || amount <= 0) {
+							showMessage(messages.error['not-valid-amount'])
+							error = true
+						}
+
+						if (validateAddress(address) == false) {
+							showMessage(messages.error['not-valid-address'])
+							error = true
+						}
+
+						total += amount * 1
+					})
+
+					total += txFee * 1
+					total = parseFloat(total.toFixed(getConfig()['decimals']))
+
+					if (!error) {
+						if (total <= amountFormat(globalData.balance)) {
+							showConfirmation(total)
+						} else {
+							showMessage(messages.error['not-enough-funds'])
+						}
+					}
+				})
+
+				// Open wallet by WIF key
+				$('#open-key-form').submit(function(e){
+					var wif = $('#passphrase').val().trim()
+					var wifLength = wif.length
+					if ([51, 52].includes(wifLength)) {
+						try {
+							globalData.keys = bitcoin.ECPair.fromWIF(wif, getConfig()['network'])
+						} catch(e) {
+							showMessage(messages.error['bad-priv-key'])
+						}
+
+						$('#passphrase').val('')
+						initWallet()
+					} else {
+						showMessage(messages.error['bad-priv-key'])
+					}
+
+					e.preventDefault()
+				})
+
+				// Open wallet using email and password
+				$("#open-regular-form").submit(function(e) {
+					var email = $("#open-email").val().toLowerCase()
+					var pass = $("#open-password").val()
+					var passConfirm = $("#open-password-confirm").val()
+					if (email.match(/[\s\w\d]+@[\s\w\d]+/g)) {
+						if (pass.length >= 10){
+							if (pass == passConfirm) {
+								var pass = pass
+								var s = email
+								s += '|' + pass + '|'
+								s += s.length + '|!@' + ((pass.length * 7) + email.length) * 7
+								var regchars = (pass.match(/[a-z]+/g)) ? pass.match(/[a-z]+/g).length : 1
+								var regupchars = (pass.match(/[A-Z]+/g)) ? pass.match(/[A-Z]+/g).length : 1
+								var regnums = (pass.match(/[0-9]+/g)) ? pass.match(/[0-9]+/g).length : 1
+								s += ((regnums + regchars) + regupchars) * pass.length + '3571'
+								s += (s + '' + s)
+
+								for (i = 0; i <= 51; i++){
+									s = sha256.update(s).hex()
+								}
+
+								$('#open-email').val('')
+								$('#open-password').val('')
+								$('#open-password-confirm').val('')
+
+								globalData.keys = bitcoin.ECPair.fromPrivateKey(
+									bitcoin.Buffer.from(s, 'hex'),
+									{'network': getConfig()['network']}
+								)
+								openWallet(globalData.keys)
+							} else {
+								showMessage(messages.error['pass-not-match'])
+							}
+						} else {
+							showMessage(messages.error['pass-too-short'])
+						}
+					} else {
+						showMessage(messages.error['bad-email'])
+					}
+
+					e.preventDefault()
+				})
+
+				// Check wallet balance on balance label click
+				$('.wallet-balance').click(function(e){
+					walletBalance()
+					e.preventDefault()
+				})
+
+				// Confirm transaction sendign (are you sure?)
+				$('#send-confirm').click(function(e){
+					sendTransaction()
+					e.preventDefault()
+				})
+
+				// Toggle private key visibility
+				$('.toggle-priv-key').click(function(){
+					if ($(this).text() == getText('show')) {
+						$(this).parent().parent().find('.keys-privkey').attr('type', 'text')
+						$(this).text(getText('hide'))
+					} else {
+						$(this).parent().parent().find('.keys-privkey').attr('type', 'password')
+						$(this).text(getText('show'))
+					}
+				})
+
+				// Add transaction output
+				$('#add-output').click(function(e){
+					$('#send-outputs').append(`
+						<div class="send-additional-output send-outputs-item input-group mb-2">
+							<input name="send-address" class="form-control" placeholder="${getText('enter-address')}" type="text">
+							<input name="send-ammount" class="form-control" placeholder="${getText('amount')}" type="text">
+							<div class="input-group-append">
+								<button class="btn btn-outline-danger remove-additional-output" type="submit">
+									<span class="entypo minus"></span>
+								</button>
+							</div>
+						</div>
+					`)
+					$('.remove-additional-output').click(function(e){
+						$(this).closest('.send-additional-output').remove()
+						e.preventDefault()
+					})
+					e.preventDefault()
+				})
+
+				// Reset send form
+				$('#send-reset').click(function(e) {
+					resetTxForm()
+					e.preventDefault()
+				})
+
+				// Reset send form
+				$('#send-qr').click(function(e) {
+					showScanModal()
+					e.preventDefault()
+				})
+
+				// Footer button which close wallet
+				$('#footer-close').click(function(e) {
+					closeWallet()
+					e.preventDefault()
+				})
+
+				// Change address type
+				$('#address-type-select select').on('change', function() {
+					switchAddressType($(this).val())
+					showMessage(messages.settings.typeSwitched($(this).val()))
+					initWallet()
+				})
+
+				// Change wallet backend
+				$('#wallet-backend button').click(function(e) {
+					switchBackend($('#wallet-backend input').val())
+				})
+
+				// Change wallet language
+				$('#wallet-language-select select').on('change', function() {
+					setCookie('language', $('#wallet-language-select select').val(), 60)
+					initLang()
+					initWallet()
+				})
+
+				// Set wallet recomended fee
+				estimateFee().then(function(data) {
+					if (data.error == undefined) {
+						globalData.rfee = amountFormat(data.result.feerate)
+					} else {
+						globalData.rfee = getConfig()['fee']
+					}
+				})
+
+				$('#scan-modal').on('hide.bs.modal', function (e) {
+					stopStream()
+				})
+			})
+		</script>
+		
+		<script>
+			document.addEventListener('DOMContentLoaded', () => {
+				walletBalance();
+				setInterval(updatePriceAndValue, 30000);
+
+				const currencySelect = document.getElementById('currencySelect');
+				if (currencySelect) {
+					currencySelect.addEventListener('change', updatePriceAndValue);
+				}
+
+				// Use jQuery safely after DOM is ready
+				$('.tab-link[data-tab-name="wallet-history"]').on('click', function () {
+					fetchWalletTxHistory();
+				});
+			});
+		</script>
+
+	</body>
+</html>
