@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     const versions = new Set();
                     const nodes = [];
 
-                    fetch("http://api.minersworld.org:4321peers")
+                    fetch("https://api.minersworld.org/peers")
                         .then(res => res.json())
                         .then(data => {
                             const peers = data.result || [];

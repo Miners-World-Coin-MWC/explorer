@@ -54,7 +54,7 @@
 							<a href="#/settings" class="nav-link router-link mr-md-2" data-route="settings" tkey="settings"></a>
 						</li>
 						<li class="nav-item">
-							<a href="http://api.minersworld.org:4321" class="nav-link">API</a>
+							<a href="https://api.minersworld.org" class="nav-link">API</a>
 						</li>
 						<li class="nav-item">
 							<a href="https://miners-world-coin-mwc.github.io/explorer" class="nav-link">Explorer</a>
@@ -532,7 +532,7 @@
 					'uri': 'MinersWorldCoin:',
 					'title': 'MWC Wallet',
 					'name': 'Main Network (MWC)',
-					'api': 'http://api.minersworld.org:4321',
+					'api': 'https://api.minersworld.org',
 					'ticker': 'MWC',
 					'decimals': 8,
 					'fee': 0.00001,
@@ -552,7 +552,7 @@
 					'uri': 'MinersWorldCoin:',
 					'title': 'MWC Wallet',
 					'name': 'Test Network (TMWC)',
-					'api': 'http://api.minersworld.org:4321',
+					'api': 'https://api.minersworld.org',
 					'ticker': 'TMWC',
 					'decimals': 8,
 					'fee': 0.00001,
@@ -650,7 +650,7 @@
 			function fetchWalletTxHistory() {
 				if (!globalData.address) return;
 
-				const historyUrl = `http://api.minersworld.org:4321/history/${globalData.address}`;
+				const historyUrl = `https://api.minersworld.org/history/${globalData.address}`;
 				const txBody = document.getElementById('tx-history-body');
 				txBody.innerHTML = '';
 				const loadingRow = document.createElement('tr');
@@ -674,7 +674,7 @@
 
 						for (const txid of txList) {
 							try {
-								const txResponse = await fetch(`http://api.minersworld.org:4321/transaction/${txid}`);
+								const txResponse = await fetch(`https://api.minersworld.org/transaction/${txid}`);
 								if (!txResponse.ok) throw new Error(`TX fetch failed: ${txid}`);
 								const txData = await txResponse.json();
 								const tx = txData.result;

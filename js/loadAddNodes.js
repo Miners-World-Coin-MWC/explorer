@@ -41,7 +41,7 @@ function normalizeIP(addr) {
 }
 
 function loadAddNodes() {
-    fetch("http://api.minersworld.org:4321peers") // temp endpoint
+    fetch("https://api.minersworld.org/peers") // temp endpoint
         .then(res => res.json())
         .then(data => {
             const cliBox = document.getElementById("cli-addnodes");
