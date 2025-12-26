@@ -29,113 +29,7 @@
 
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-        
 
-
-
-		<!-- <style>
-			html {
-				height: 100%;
-			}
-			html, body {
-				min-height: 100%;
-			}
-			body {
-				font-family: 'Source Sans Pro', sans-serif;
-				padding-top: 75px;
-				padding-bottom: 56px;
-				position: relative;
-			}
-			#logo {
-				max-width: 30px;
-				max-height: 30px;
-				margin-top: -5px;
-				margin-right: 5px;
-			}
-			.b-width {
-				min-width: 100px;
-			}
-			.navbar-dark .navbar-nav .nav-link.active {
-				color: rgba(255,255,255,.75);
-			}
-			.router-page {
-				display: none;
-			}
-			.c-pointer {
-				cursor: pointer;
-			}
-			.disabled {
-				pointer-events: none;
-			}
-			.break-lines {
-			  /* https://stackoverflow.com/a/18706058/9217774 <3 */
-			  -ms-word-break: break-all;
-				word-break: break-all;
-
-			  /* Non standard for webkit */
-				word-break: break-word;
-
-				-webkit-hyphens: auto;
-				   -moz-hyphens: auto;
-					-ms-hyphens: auto;
-						hyphens: auto;
-			}
-			.qr-code canvas{
-				max-width: 100%;
-			}
-			.wallet-balance {
-				font-size: 23px;
-			}
-			.wallet-balance .text-monospace {
-				font-size: 20px;
-			}
-			[class*="entypo"]:before {
-				font-family: 'EntypoRegular', sans-serif;
-				font-size: 16px;
-			}
-			@media (max-width: 991.98px) {
-				.navbar-expand-lg>.container, .navbar-expand-lg>.container-fluid {
-					padding-right: 15px;
-					padding-left: 15px;
-				}
-			}
-			.balance-small {
-				font-size: 15px;
-			}
-			.send-balance-fix {
-				padding: 0px 0px 8px 0px;
-				display: inline-block;
-			}
-			.break-word {
-				word-wrap: break-word;
-			}
-            .word-break {
-                word-break: break-all;
-                font-family: monospace;
-            }
-
-            @media print {
-                body * {
-                    visibility: visible;
-                }
-                #paper-wallet, #paper-wallet * {
-                    visibility: visible;
-                }
-                #paper-wallet {
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                }
-                #paper-qr {
-                    width: 128px;
-                    height: 128px;
-                    display: block;
-                    margin: 10px auto;
-                }
-
-            }
-
-		</style> -->
 		<title> Paper Wallet</title>
 		<meta name="description" content="MinersWorldCoin Paper Wallet">
 	</head>
@@ -575,6 +469,26 @@
 						'pubKeyHash': 0x14,
 						'scriptHash': 0x0A,
 						'wif': 0x7B
+					}
+				},
+				'TMWC': {
+					'uri': 'MinersWorldCoin:',
+					'title': 'MWC Wallet',
+					'name': 'Test Network (TMWC)',
+					'api': 'http://api.minersworld.org:4321',
+					'ticker': 'TMWC',
+					'decimals': 8,
+					'fee': 0.00001,
+					'network': {
+						'messagePrefix': '\x19MinersWorldCoin Signed Message:\n',
+						'bip32': {
+							'public': 0x043587cf,
+							'private': 0x04358394
+						},
+						'bech32': 'tmwc',
+						'pubKeyHash': 0x53,
+						'scriptHash': 0xC5,
+						'wif': 0xF0
 					}
 				},
 				
