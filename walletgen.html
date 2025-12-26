@@ -187,7 +187,7 @@
 							<a href="http://api.minersworld.org:4321" class="nav-link">API</a>
 						</li>
 						<li class="nav-item">
-							<a href="https://minersworldcoin.github.io" class="nav-link">Explorer</a>
+							<a href="https://miners-world-coin-mwc.github.io/explorer" class="nav-link">Explorer</a>
 						</li>
 						<li class="nav-item">
 							<a href="https://minersworld.org" class="nav-link">Website</a>
@@ -583,10 +583,10 @@
 			// Explorer links
 			var blockExplorer = {
 				'address': function(address) {
-					return 'https://minersworldcoin.github.io/#/address/' + address + '/' + getConfig()['ticker']
+					return 'https://miners-world-coin-mwc.github.io/explorer/#/address/' + address + '/' + getConfig()['ticker']
 				},
 				'tx': function(tx) {
-					return 'https://minersworldcoin.github.io/#/transaction/' + tx + '/' + getConfig()['ticker']
+					return 'https://miners-world-coin-mwc.github.io/explorer/#/transaction/' + tx + '/' + getConfig()['ticker']
 				}
 			}
 
@@ -1029,10 +1029,10 @@
     switchPage('paper');
 });
 
-// $('#bg-selector').on('change', function () {
-//     const selectedBg = $(this).val()
-//     $('#paper-container').css('background-image', `url('${selectedBg}')`)
-// })
+$('#bg-selector').on('change', function () {
+    const selectedBg = $(this).val()
+    $('#paper-container').css('background-image', `url('${selectedBg}')`)
+})
 
 // Function to generate QR for the private and public keys
 function generateQR() {

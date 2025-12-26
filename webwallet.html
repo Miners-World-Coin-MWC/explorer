@@ -57,7 +57,7 @@
 							<a href="http://api.minersworld.org:4321" class="nav-link">API</a>
 						</li>
 						<li class="nav-item">
-							<a href="https://minersworldcoin.github.io" class="nav-link">Explorer</a>
+							<a href="https://miners-world-coin-mwc.github.io/explorer" class="nav-link">Explorer</a>
 						</li>
 						<li class="nav-item">
 							<a href="https://minersworld.org" class="nav-link">Website</a>
@@ -159,7 +159,7 @@
 									<a class="nav-link tab-link" data-tab-name="wallet-send" data-tab-family="wallet-block" href="#" tkey="send"></a>
 								</li>
 								<li class="nav-item mr-2">
-                                    <a id="history-link" class="nav-link" target="_blank" href="https://minersworldcoin.github.io/#/address/" tkey="address"></a>
+                                    <a id="history-link" class="nav-link" target="_blank" href="https://miners-world-coin-mwc.github.io/explorer/#/address/" tkey="address"></a>
                                 </li>
                                 <li class="nav-item mr-2">
                                     <a class="nav-link tab-link" data-tab-name="wallet-history" data-tab-family="wallet-block" href="#" tkey="history"></a>
@@ -574,10 +574,10 @@
 			// Explorer links
 			var blockExplorer = {
 				'address': function(address) {
-					return 'https://minersworldcoin.github.io/#/address/' + address + '/' + getConfig()['ticker']
+					return 'https://miners-world-coin-mwc.github.io/explorer/#/address/' + address + '/' + getConfig()['ticker']
 				},
 				'tx': function(tx) {
-					return 'https://minersworldcoin.github.io/#/transaction/' + tx + '/' + getConfig()['ticker']
+					return 'https://miners-world-coin-mwc.github.io/explorer/#/transaction/' + tx + '/' + getConfig()['ticker']
 				}
 			}
 
@@ -674,7 +674,7 @@
 
 						for (const txid of txList) {
 							try {
-								const txResponse = await fetch(`http://api.minersworld.org:4321transaction/${txid}`);
+								const txResponse = await fetch(`http://api.minersworld.org:4321/transaction/${txid}`);
 								if (!txResponse.ok) throw new Error(`TX fetch failed: ${txid}`);
 								const txData = await txResponse.json();
 								const tx = txData.result;
@@ -714,7 +714,7 @@
 
 								const row = document.createElement('tr');
 								row.innerHTML = `
-									<td><a href="https://minersworldcoin.github.io/#/transaction/${tx.txid}" target="_blank">${tx.txid.slice(0, 12)}...</a></td>
+									<td><a href="https://miners-world-coin-mwc.github.io/explorer/#/transaction/${tx.txid}" target="_blank">${tx.txid.slice(0, 12)}...</a></td>
 									<td><span class="badge badge-${txType === 'Received' ? 'success' : txType === 'Sent' ? 'danger' : 'secondary'}">${txType}</span></td>
 									<td style="color:${amountColor}">${netAmount.toLocaleString(undefined, {
 										minimumFractionDigits: 2,
