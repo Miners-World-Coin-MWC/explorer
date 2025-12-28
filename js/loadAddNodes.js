@@ -1,3 +1,22 @@
+// =======================================
+// Network Configuration
+// =======================================
+const NETWORKS = {
+    mainnet: {
+        name: "Mainnet",
+        endpoint: "https://api.minersworld.org/peers",
+        confPrefix: ""
+    },
+    testnet: {
+        name: "Testnet",
+        endpoint: "https://api.minersworld.org/testnet/peers",
+        confPrefix: "testnet=1\n"
+    }
+};
+
+// =======================================
+// UI Helpers
+// =======================================
 function createRow(ip, online, command) {
     const row = document.createElement("div");
     row.className = "addnode-row";
@@ -17,7 +36,9 @@ function createRow(ip, online, command) {
     copy.onclick = () => {
         navigator.clipboard.writeText(command);
         copy.innerHTML = "✓";
-        setTimeout(() => (copy.innerHTML = '<i class="fa fa-copy"></i>'), 1200);
+        setTimeout(() => {
+            copy.innerHTML = '<i class="fa fa-copy"></i>';
+        }, 1200);
     };
 
     row.appendChild(status);
@@ -27,21 +48,38 @@ function createRow(ip, online, command) {
     return row;
 }
 
+// =======================================
+// Normalize IPv4 / IPv6
+// =======================================
 function normalizeIP(addr) {
+    if (!addr) return "";
+
+    // IPv6 [addr]:port
     if (addr.startsWith("[")) {
         const end = addr.indexOf("]");
         return end !== -1 ? addr.substring(1, end) : addr;
     }
+
+    // IPv4:port
     if (addr.includes(":")) {
         const last = addr.lastIndexOf(":");
         const port = addr.substring(last + 1);
-        if (!isNaN(parseInt(port))) return addr.substring(0, last);
+        if (!isNaN(parseInt(port))) {
+            return addr.substring(0, last);
+        }
     }
+
     return addr;
 }
 
-function loadAddNodes() {
-    fetch("https://api.minersworld.org/peers") // temp endpoint
+// =======================================
+// Load Peers (Mainnet / Testnet)
+// =======================================
+function loadAddNodes(network = "mainnet") {
+    const net = NETWORKS[network];
+    if (!net) return;
+
+    fetch(net.endpoint)
         .then(res => res.json())
         .then(data => {
             const cliBox = document.getElementById("cli-addnodes");
@@ -50,7 +88,7 @@ function loadAddNodes() {
             cliBox.innerHTML = "";
             confBox.innerHTML = "";
 
-            if (data.error || !data.result || data.result.length === 0) {
+            if (!data.result || data.result.length === 0) {
                 cliBox.textContent = "No peers available.";
                 confBox.textContent = "No peers available.";
                 return;
@@ -60,23 +98,38 @@ function loadAddNodes() {
 
             data.result.forEach(peer => {
                 const ip = normalizeIP(peer.addr);
-                if (seen.has(ip)) return;
+                if (!ip || seen.has(ip)) return;
                 seen.add(ip);
 
-                const online = true; // peers endpoint = connected
+                const online = true;
 
+                // CLI command
                 cliBox.appendChild(
                     createRow(ip, online, `addnode "${ip}" add`)
                 );
 
+                // conf command
                 confBox.appendChild(
-                    createRow(ip, online, `addnode=${ip}`)
+                    createRow(
+                        ip,
+                        online,
+                        `${net.confPrefix}addnode=${ip}`
+                    )
                 );
             });
         })
         .catch(err => {
-            console.error(err);
+            console.error("Failed to load peers:", err);
         });
 }
 
-document.addEventListener("DOMContentLoaded", loadAddNodes);
+// =======================================
+// Auto Network Detection
+// =======================================
+document.addEventListener("DOMContentLoaded", () => {
+    const isTestnet =
+        location.search.includes("testnet") ||
+        location.pathname.includes("testnet");
+
+    loadAddNodes(isTestnet ? "testnet" : "mainnet");
+});

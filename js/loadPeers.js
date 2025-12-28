@@ -1,11 +1,55 @@
-function loadPeers() {
-    fetch("https://api.minersworld.org/peers")
+// =======================================
+// Network Configuration
+// =======================================
+const NETWORKS = {
+    mainnet: {
+        name: "Mainnet",
+        endpoint: "https://api.minersworld.org/peers"
+    },
+    testnet: {
+        name: "Testnet",
+        endpoint: "https://api.minersworld.org/testnet/peers"
+    }
+};
+
+// =======================================
+// Normalize IP (IPv4 / IPv6 safe)
+// =======================================
+function normalizeIP(addr) {
+    if (!addr) return "";
+
+    // IPv6 [addr]:port
+    if (addr.startsWith("[")) {
+        const end = addr.indexOf("]");
+        return end !== -1 ? addr.substring(1, end) : addr;
+    }
+
+    // IPv4:port
+    if (addr.includes(":")) {
+        const last = addr.lastIndexOf(":");
+        const port = addr.substring(last + 1);
+        if (!isNaN(parseInt(port))) {
+            return addr.substring(0, last);
+        }
+    }
+
+    return addr;
+}
+
+// =======================================
+// Load Peers (Mainnet / Testnet)
+// =======================================
+function loadPeers(network = "mainnet") {
+    const net = NETWORKS[network];
+    if (!net) return;
+
+    fetch(net.endpoint)
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById("peers-list");
             tbody.innerHTML = "";
 
-            if (data.error) {
+            if (data.error || !data.result) {
                 tbody.innerHTML = `<tr><td colspan="4">Error loading peers</td></tr>`;
                 return;
             }
@@ -16,56 +60,46 @@ function loadPeers() {
                 return;
             }
 
-            // Process each peer
             peers.forEach(peer => {
                 const row = document.createElement("tr");
 
-                // Extract IP Address (handling both IPv4 and IPv6)
-                const ip = peer.addr;
-                let displayIp = ip;
+                const ipRaw = peer.addr || "";
+                const displayIp = normalizeIP(ipRaw);
 
-                // If it's an IPv6 address, we extract the base address (IPv6 can include port info in brackets)
-                if (ip.includes(":")) {
-                    // Extract just the IPv6 address part, strip brackets if present
-                    // For IPv6, ensure the entire address is displayed
-                    displayIp = ip.startsWith("[") ? ip.slice(1, -1) : ip;
-                }
-
-                // Extract other peer information
                 const subver = peer.subver || "N/A";
-                const pingtime = parseFloat(peer.pingtime).toFixed(3);
+                const pingtime = peer.pingtime
+                    ? parseFloat(peer.pingtime).toFixed(3)
+                    : "N/A";
 
-                // Use GeoJS to get the location info for the IP address
-                fetch(`https://get.geojs.io/v1/ip/geo/${ip}.json`)
-                    .then(response => response.json())
-                    .then(geoData => {
-                        const country = geoData.country || "Unknown";
-                        const countryCode = geoData.country_code || "US"; // Default to US if no country code found
+                // GeoJS lookup (use normalized IP)
+                fetch(`https://get.geojs.io/v1/ip/geo/${displayIp}.json`)
+                    .then(res => res.json())
+                    .then(geo => {
+                        const country = geo.country || "Unknown";
+                        const code = geo.country_code
+                            ? geo.country_code.toLowerCase()
+                            : null;
 
-                        // Function to get the actual flag image from the country code
-                        const getFlagUrl = (countryCode) => {
-                            return `https://flagcdn.com/w320/${countryCode.toLowerCase()}.png`;
-                        };
+                        const flag = code
+                            ? `<img src="https://flagcdn.com/w20/${code}.png"
+                                   alt="${country}"
+                                   style="width:20px;height:15px;margin-right:6px;">`
+                            : "";
 
-                        const flagUrl = getFlagUrl(countryCode); // Get the flag image URL
-
-                        // Fill the row with peer data
                         row.innerHTML = `
                             <td>${displayIp}</td>
                             <td>${subver}</td>
                             <td>${pingtime}</td>
-                            <td><img src="${flagUrl}" alt="${country}" style="width: 20px; height: 15px; margin-right: 5px;"/> ${country}</td>
+                            <td>${flag}${country}</td>
                         `;
                         tbody.appendChild(row);
                     })
                     .catch(err => {
-                        // In case GeoJS fails, just show Unknown for location
-                        const country = "Unknown";
                         row.innerHTML = `
                             <td>${displayIp}</td>
                             <td>${subver}</td>
                             <td>${pingtime}</td>
-                            <td>${country}</td>
+                            <td>Unknown</td>
                         `;
                         tbody.appendChild(row);
                         console.error("GeoJS error:", err);
@@ -79,5 +113,13 @@ function loadPeers() {
         });
 }
 
-// Load peers on home load
-document.addEventListener("DOMContentLoaded", loadPeers);
+// =======================================
+// Auto Network Detection
+// =======================================
+document.addEventListener("DOMContentLoaded", () => {
+    const isTestnet =
+        location.search.includes("testnet") ||
+        location.pathname.includes("testnet");
+
+    loadPeers(isTestnet ? "testnet" : "mainnet");
+});
