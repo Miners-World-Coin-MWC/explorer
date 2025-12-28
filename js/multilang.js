@@ -5,6 +5,7 @@ var walletLanguages = {
 		'open-regular': 'Regular wallet',
 		'open-key': 'Open by key',
 		'disclaimer': 'This page uses javascript to generate your addresses and sign your transactions within your browser, this means we never receive your private keys, this can be independently verified by reviewing the source code on Github.',
+		'disclaimer1': 'Do NOT mine to the web wallet as it may cause your transactions to become stuck, If your transactions are stuck like this, You will need to download the core wallet and import your privkey to recover your funds. The MWC team nor the wallet developer can help you recover these funds as we have no access to any private information',
 		'open-reminder': '<b>Notice:</b> Please make sure that you remember your account details, otherwise you may lose access to your funds.',
 		'open': 'Open',
 		'home': 'Home',

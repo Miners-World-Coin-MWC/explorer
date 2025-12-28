@@ -554,3 +554,120 @@ html {
   }
 }
 
+/* =========================
+   DISCLAIMER BLOCKS (MWC)
+========================= */
+.disclaimer,
+.disclaimer1 {
+  margin-top: 1.5rem;
+}
+
+.disclaimer .container,
+.disclaimer1 .container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.disclaimer small,
+.disclaimer1 small {
+  display: inline-block;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    rgba(2, 6, 23, 0.9),
+    rgba(15, 23, 42, 0.9)
+  );
+  border: 1px solid var(--border-soft);
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+}
+
+/* Slight accent for the second disclaimer */
+.disclaimer1 small {
+  border-left: 3px solid var(--accent);
+}
+
+/* Optional subtle mining glow on hover */
+.disclaimer small:hover,
+.disclaimer1 small:hover {
+  color: var(--text-main);
+  box-shadow:
+    0 0 12px var(--accent-glow),
+    0 6px 18px rgba(0,0,0,0.6);
+  transition: 0.25s ease;
+}
+
+/* =========================
+   LIGHT MODE TWEAKS
+========================= */
+body.light .disclaimer small,
+body.light .disclaimer1 small {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  color: var(--text-muted);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+
+/* =========================
+   IMPORTANT DISCLAIMER (LARGE)
+========================= */
+.disclaimer1 small {
+  display: block;
+  max-width: 1100px;
+  margin: 0 auto;
+
+  padding: 20px 26px;
+  border-radius: 14px;
+
+  font-size: 15.5px;          /* ⬅ bigger text */
+  line-height: 1.65;          /* ⬅ easier to read */
+  font-weight: 500;
+
+  color: var(--text-main);
+
+  background: linear-gradient(
+    180deg,
+    rgba(2, 6, 23, 0.95),
+    rgba(15, 23, 42, 0.95)
+  );
+
+  border-left: 5px solid var(--accent); /* ⬅ stronger accent */
+  box-shadow:
+    0 0 0 1px var(--border-soft),
+    0 10px 30px rgba(0,0,0,0.6);
+}
+
+/* Optional warning icon emphasis */
+.disclaimer1 small::before {
+  content: "⚠️ ";
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.disclaimer1 small::after {
+  content: "⚠️ ";
+  font-weight: 700;
+  color: var(--accent);
+}
+
+/* Hover emphasis (subtle, not flashy) */
+.disclaimer1 small:hover {
+  box-shadow:
+    0 0 14px var(--accent-glow),
+    0 12px 32px rgba(0,0,0,0.75);
+  transition: 0.25s ease;
+}
+
+/* =========================
+   LIGHT MODE ADJUSTMENT
+========================= */
+body.light .disclaimer1 small {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  color: #020617;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.12);
+}
+
+
