@@ -9,7 +9,7 @@ var networksConfigs = {
     },
     'TMWC': {
         'name': 'Test Network (TMWC)',
-        'api': 'https://api.minersworld.org',
+        'api': 'https://api.minersworld.org/testnet',
         'ticker': 'TMWC',
         'decimals': 8,
         'hrp': 'tmwc'
