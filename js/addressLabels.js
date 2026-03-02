@@ -1,10 +1,11 @@
 const addressLabels = {
     // MWC Wallets
     "98AUvgXPjAdKHj3FqwAPJNpd8XergXBL59": "Dev Fee Wallet",
-    // "AKUg58E171GVJNw2RQzooQnuHs1zns2ecD": "Developer Wallet",
-    // "AJzNjXgPYUGe9cmWz2ND7hrEYA1AiwpggX": "Community Wallet",
-    // "Ac2DHE6freiBENuzZ3VTfY8zwwKc2oX2Fw": "Charity Wallet",
-    // "AMmKZs3GTWQnGdk3WjR9Q35cizHDVtHjie": "Staff Payment Wallet",
+    "9Pt3nFwZhWWxN9BrQZrUEYQtgZaDdrxyVi": "Development & Maintenance",
+    "9Dt3g2g5AWDhBDyXhfwXE7gGEJsQd6vdzW": "Community Wallet",
+    "94LcpGmThCmDZCULFkvxckk9HQHtyGPBV3": "Charity Wallet",
+    "9EK54xP6jKMzrWTf32YD7wetkAVCyFJViP": "Listing Fee Wallet",
+    "9FjHgGtKj7Y7XabpqGPAPvUuUjQ29TE5is": "Staff Payment Wallet (UNCLAIMED)",
     // // Pool addresses
     // "AREstbeSFzzbMGToUF6E2i3DbPa5nJB4Lz": "NovaGrid",
     // "Ae5vqtfRFKWYVfgCzyR4iat8FuKfLH4jve": "Coin-Miners",
