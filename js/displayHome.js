@@ -1,13 +1,15 @@
 function displayHome() {
-    $('#supply span').text('Loading...')
     networkInfo().then(function(data) {
         var height = data.result.blocks
-        var display_height = Number($('#blocks-table tbody tr:first-child').attr('data-height'))
+        var display_height = Number($('#blocks-table tbody tr[data-height]').first().attr('data-height'))
 
-        circulatingSupply = parseInt(amountFormat(data.result.supply))
-        $('#supply span').text(circulatingSupply.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' ' + getApi()['ticker']);
+        var supply = parseInt(amountFormat(data.result.supply))
+        $('#supply .stat-value').removeClass('loading').find('span').text(fmtNum(supply))
+        $('#supply .stat-sub').text(getApi()['ticker'] + ' · click to refresh')
+        $('#stat-height').removeClass('loading').text(fmtNum(height))
 
-        if (height != display_height || $('#blocks-table tbody tr').length > 0) {
+        // Only reload the table when there is a new block
+        if (height != display_height) {
             getBlocks(height).then(function(blocks) {
                 if (blocks['error'] == undefined) {
                     displayBlocks(blocks['result'], true)
@@ -21,6 +23,7 @@ function displayHome() {
                         'nethash': []
                     }
 
+                    // After displayBlocks the list is oldest-first; flip it to newest-first
                     $.each(blocks['result'].reverse(), function(index, block) {
                         chart_data['diffs'].push(block['difficulty'])
                         chart_data['blocks'].push(block['height'])
@@ -30,11 +33,30 @@ function displayHome() {
                         chart_data['nethash'].push(block['nethash'])
                     })
 
+                    // Stat tiles (index 0 is the newest block)
+                    if (chart_data.blocks.length > 0) {
+                        $('#stat-hashrate').removeClass('loading').text(convertHashes(chart_data.nethash[0]))
+                        $('#stat-difficulty').removeClass('loading').text(fmtDifficulty(chart_data.diffs[0]))
+
+                        var n = chart_data.timestamps.length
+                        if (n > 1) {
+                            var avg = (chart_data.timestamps[0] - chart_data.timestamps[n - 1]) / (n - 1)
+                            $('#stat-blocktime').text('Avg block time ' + (avg >= 60 ? (avg / 60).toFixed(1) + ' min' : Math.round(avg) + ' sec'))
+                        }
+                    }
+
                     showCharts(chart_data)
+                    refreshAges()
                 } else {
                     showError(errorMessages['blocks-load-error'])
                 }
+            }).catch(function() {
+                showError(errorMessages['blocks-load-error'])
             })
         }
+    }).catch(function() {
+        $('#blocks-table tbody .skeleton-row').first().closest('tbody').html(
+            '<tr class="skeleton-row"><td colspan="4" class="text-center text-muted py-4">Could not reach the API. Retrying automatically…</td></tr>'
+        )
     })
 }

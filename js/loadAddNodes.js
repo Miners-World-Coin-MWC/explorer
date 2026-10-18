@@ -1,7 +1,7 @@
 // =======================================
 // Network Configuration
 // =======================================
-const NETWORKS = {
+const ADDNODE_NETWORKS = {
     mainnet: {
         name: "Mainnet",
         endpoint: "https://api.minersworld.org/peers",
@@ -76,7 +76,7 @@ function normalizeIP(addr) {
 // Load Peers (Mainnet / Testnet)
 // =======================================
 function loadAddNodes(network = "mainnet") {
-    const net = NETWORKS[network];
+    const net = ADDNODE_NETWORKS[network];
     if (!net) return;
 
     fetch(net.endpoint)

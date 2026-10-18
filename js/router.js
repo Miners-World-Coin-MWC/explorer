@@ -16,6 +16,9 @@ function routePage() {
             }
         }
 
+        $('#page-head').toggle(pageName == 'homepage')
+        window.scrollTo(0, 0)
+
         switch(pageName) {
             // Block info page
             case 'block':
@@ -28,7 +31,8 @@ function routePage() {
                         switchApi(api, page)
                     } else {
                         if (data_block_hash != urlParams[2]) {
-                            $('#block-info-tx-total').addClass('d-none')
+                            $('#block-tx-title').hide()
+                            $('#block-transactions').empty()
                             $('#block-info-table').empty()
                             blockInfo(block_hash).then(function(block) {
                                 if (block['error'] == undefined) {
@@ -73,6 +77,12 @@ function routePage() {
                                     showError(errorMessages['tx-not-found'])
                                     switchPage()
                                 }
+                            }).catch(function() {
+                                $('#tx-info-table').html(
+                                    '<div class="card kv-card mb-3"><div class="kv-head"><div><h2>Transaction unavailable</h2>' +
+                                    '<div class="kv-sub">' + esc(errorMessages['tx-load-error']) + '</div></div>' +
+                                    '<button type="button" class="btn btn-sm btn-outline-dark" onclick="location.reload()">Retry</button></div>' +
+                                    kvRow('Transaction hash', esc(tx_hash) + copyBtn(tx_hash), 'mono') + '</div>')
                             })
                         } else {
                             setTitle('Transaction ' + data_tx_hash)
@@ -95,7 +105,8 @@ function routePage() {
                         switchApi(api, page)
                     } else {
                         if (data_address != urlParams[2]) {
-                            $('#address-history').addClass('d-none')
+                            $('#address-tx-title').hide()
+                            $('#address-transactions').empty()
                             $('#address-info-table').empty()
                             addressBalance(address).then(function(data) {
                                 if (data['error'] == undefined) {

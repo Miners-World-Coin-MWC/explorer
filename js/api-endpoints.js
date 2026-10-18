@@ -1,3 +1,6 @@
+// A hung API request must not leave the page waiting forever
+$.ajaxSetup({ timeout: 25000 })
+
 // Bocks request
 function getBlocks(start, offset = 30) {
     return Promise.resolve($.ajax({

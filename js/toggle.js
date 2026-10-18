@@ -1,20 +1,21 @@
-const toggle = document.getElementById('themeToggle')
+// Light / dark theme toggle (saved choice wins, otherwise follow the system)
+(function() {
+    var btn = document.getElementById('themeToggle')
+    if (!btn) return
 
-			// Auto-detect system theme
-			if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-				document.body.classList.add('light')
-			}
+    var saved = null
+    try { saved = localStorage.getItem('mwc-theme') } catch (e) {}
 
-			toggle.addEventListener('click', () => {
-				document.body.classList.toggle('light')
-				localStorage.setItem(
-				'mwc-theme',
-				document.body.classList.contains('light') ? 'light' : 'dark'
-				)
-			})
+    var light = saved ? saved === 'light' : window.matchMedia('(prefers-color-scheme: light)').matches
+    document.body.classList.toggle('light', light)
 
-			// Persist choice
-			const saved = localStorage.getItem('mwc-theme')
-			if (saved === 'light') {
-				document.body.classList.add('light')
-			}
+    btn.addEventListener('click', function() {
+        var isLight = document.body.classList.toggle('light')
+        try { localStorage.setItem('mwc-theme', isLight ? 'light' : 'dark') } catch (e) {}
+
+        // Redraw the chart so it picks up the new colors
+        if (window.__chartData && typeof showCharts === 'function') {
+            showCharts(window.__chartData)
+        }
+    })
+})()

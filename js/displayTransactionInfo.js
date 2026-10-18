@@ -1,67 +1,49 @@
 function displayTransactionInfo(data) {
-    content = `
-        <div class="card mb-3">
-            <div class="table-responsive">
-                <table class="table table-borderless table-md table-striped mb-0">
-                    <tbody>
-                        <tr>
-                            <td>Transaction Hash</td>
-                            <td id="tx-info-hash" data-tx-info-hash="${data.txid}">${data.txid}</td>
-                        </tr>
-                        ${data.time != undefined ? `
-                            <tr>
-                                <td>Timestamp</td>
-                                <td>${timeFormat(data.time)} (<b>${data.time}</b>)</td>
-                            </tr>
-                        ` : ''}
-                        <tr>
-                            <td>Height</td>
-                            <td>
-                                ${data.blockhash != undefined ? `
-                                    <a href="#/block/${data.blockhash}">${data.height}</a> (<b>Confirmations ${data.confirmations}</b>)
-                                ` : `
-                                    <span class="text-danger">This transaction located in memory pool and not included to blockchain yet!</span>
-                                `}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Amount Transferred</td>
-                            <td><span class="text-monospace">${amountFormat(data.amount)}</span> <b>${getApi()['ticker']}</b></td>
-                        </tr>
-                        <tr>
-                            <td>Size</td>
-                            <td>${data.size} (bytes)</td>
-                        </tr>
-                        <tr>
-                            <td>Version</td>
-                            <td>${data.version}</td>
-                        </tr>
-                        <tr class="${data.locktime == 0 ? 'd-none' : ''}">
-                            <td>Locktime</td>
-                            <td>${data.locktime}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>`
-
-    $('#tx-info-table').html(content)
-    $('#tx-info-vout-total .card-header b').text(data.vout.length)
-    $('#tx-info-vin-total .card-header b').text(data.vin.length)
-    $('#tx-vout-list').empty()
-    $('#tx-vin-list').empty()
+    var isCoinbase = data.vin.some(function(vin) { return vin.coinbase != undefined })
 
     var vin_amount = 0
     data.vin.forEach(function(vin) {
-        vin_amount += vin.value
+        if (vin.value != undefined) vin_amount += vin.value
     })
 
     var vout_amount = 0
     data.vout.forEach(function(vout) {
-        vout_amount += vout.value
+        if (vout.value != undefined) vout_amount += vout.value
     })
 
-    var fee = vin_amount - vout_amount
+    var fee = isCoinbase ? 0 : vin_amount - vout_amount
+    var confirmed = data.blockhash != undefined
+
+    var status = confirmed
+        ? `<span class="badge badge-ok">${fmtNum(data.confirmations)} confirmations</span>`
+        : `<span class="badge badge-pending">Unconfirmed</span>`
+
+    var content = `
+        <div class="card kv-card mb-3">
+            <div class="kv-head">
+                <div>
+                    <h2>Transaction</h2>
+                    ${data.time != undefined ? `<div class="kv-sub">${timeFormat(data.time)} &middot; <span data-age="${esc(data.time)}">${timeAgo(data.time)}</span></div>` : ''}
+                </div>
+                <div>${status}${isCoinbase ? ' <span class="badge badge-coinbase">Coinbase</span>' : ''}</div>
+            </div>
+            ${kvRow('Transaction hash', `<span id="tx-info-hash" data-tx-info-hash="${esc(data.txid)}">${esc(data.txid)}</span>${copyBtn(data.txid)}`, 'mono')}
+            ${kvRow('Block', confirmed
+                ? `<a href="#/block/${esc(data.blockhash)}">#${fmtNum(data.height)}</a>`
+                : `<span class="text-danger">In the memory pool, not yet included in a block</span>`)}
+            ${data.time != undefined ? kvRow('Timestamp', `${timeFormat(data.time)} <span class="text-muted">(${esc(data.time)})</span>`) : ''}
+            ${kvRow('Amount transferred', amountHtml(data.amount))}
+            ${isCoinbase ? '' : kvRow('Fee', amountHtml(fee))}
+            ${kvRow('Size', `${fmtNum(data.size)} bytes`)}
+            ${kvRow('Version', esc(data.version))}
+            ${data.locktime != 0 ? kvRow('Locktime', esc(data.locktime)) : ''}
+        </div>`
+
+    $('#tx-info-table').html(content)
+    $('#tx-vout-count').text(data.vout.length)
+    $('#tx-vin-count').text(data.vin.length)
+    $('#tx-vout-list').empty()
+    $('#tx-vin-list').empty()
 
     displayTxVout(data.vout, fee)
     displayTxVin(data.vin)

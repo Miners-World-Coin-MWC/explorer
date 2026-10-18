@@ -3,6 +3,7 @@ var errorMessages = {
     'blocks-load-error': 'There was an error while trying to load the blocks!',
     'blocks-not-found': 'Block not found!',
     'tx-not-found': 'Transaction not found!',
+    'tx-load-error': 'The API did not return this transaction in time.',
     'nan-error': 'The height of the block should be a non-negative integer!',
     'no-block-specified': 'You must specify blocks!',
     'no-tx-specified': 'You must specify transaction!',

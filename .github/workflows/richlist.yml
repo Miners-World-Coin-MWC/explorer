@@ -1,0 +1,39 @@
+name: Update richlist
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'     # every 30 minutes (GitHub may delay scheduled runs a few minutes)
+  workflow_dispatch:           # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write              # needed to push the richlist-data branch
+
+# Never run two crawls at once (the first full crawl can take hours)
+concurrency:
+  group: richlist
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore saved state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash tools/restore-richlist.sh
+
+      - name: Build snapshot
+        # --max-minutes keeps a long first crawl inside the job limit; the next run simply continues
+        run: node tools/build-richlist.js --concurrency 6 --max-minutes 330
+
+      - name: Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash tools/publish-richlist.sh

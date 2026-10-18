@@ -1,4 +1,6 @@
 function showCharts(data) {
+    window.__chartData = data // kept so the chart can be redrawn when the theme changes
+
     var step = 2
 
     if ($(document).width() < 576) {
@@ -7,129 +9,114 @@ function showCharts(data) {
         step = 4
     }
 
+    // Pull colors from the active theme
+    var css = getComputedStyle(document.body)
+    var v = function(name, fallback) { return (css.getPropertyValue(name) || fallback).trim() || fallback }
+    var muted = v('--text-muted', '#8b95a5')
+    var grid = v('--border-soft', '#1e2733')
+    var card = v('--bg-card', '#121821')
+    var text = v('--text-main', '#e6e9ef')
+    var colors = {
+        hash: v('--accent', '#f5a524'),
+        diff: v('--info', '#60a5fa'),
+        txs: v('--ok', '#34d399'),
+        size: '#a78bfa'
+    }
+
+    var hidden = function(opposite) {
+        return { 'labels': { 'enabled': false }, 'title': { 'text': null }, 'gridLineWidth': 0, 'opposite': !!opposite }
+    }
+
     $('#charts').removeClass('d-none')
     Highcharts.chart('network-chart', {
         'chart': {
             'type': 'spline',
-            'height': 240,
-            'marginLeft': 40, // Keep all charts left aligned
-            'spacingTop': 20,
-            'spacingBottom': 20
+            'height': 260,
+            'backgroundColor': 'transparent',
+            'marginLeft': 8,
+            'marginRight': 8,
+            'spacingTop': 8,
+            'spacingBottom': 8,
+            'style': { 'fontFamily': 'Inter, sans-serif' }
         },
-        'title': {
-            'text': ''
+        'title': { 'text': '' },
+        'credits': { 'enabled': false },
+        'exporting': { 'enabled': false },
+        'legend': {
+            'itemStyle': { 'color': muted, 'fontWeight': '500', 'fontSize': '12px' },
+            'itemHoverStyle': { 'color': text }
         },
         'xAxis': [{
-            'categories': [].concat(data["blocks"]).reverse(),
-            'crosshair': true,
-            'labels': {
-                'enabled': true,
-                'step': step
-            }
+            'categories': [].concat(data['blocks']).reverse(),
+            'crosshair': { 'color': grid, 'width': 1 },
+            'lineColor': grid,
+            'tickColor': grid,
+            'labels': { 'enabled': true, 'step': step, 'style': { 'color': muted, 'fontSize': '11px' } }
         }],
-        'yAxis': [{
-            'labels': {
-                'enabled': false
-            },
-            'title': {
-                'text': null
-            }
-        }, {
-            'labels': {
-                'enabled': false
-            },
-            'title': {
-                'text': null
-            }
-        }, {
-            'labels': {
-                'enabled': false
-            },
-            'title': {
-                'text': null
-            },
-            'opposite': true
-        }, {
-            'labels': {
-                'enabled': false
-            },
-            'title': {
-                'text': null
-            }
-        }, {
-            'labels': {
-                'enabled': false
-            },
-            'title': {
-                'text': null
-            }
-        }],
+        'yAxis': [hidden(), hidden(), hidden(true), hidden(), hidden()],
         'tooltip': {
             'shared': true,
+            'backgroundColor': card,
+            'borderColor': grid,
+            'style': { 'color': text },
             formatter: function() {
-                var s = '<b>' + this.x + '</b>';
+                var s = '<b>Block ' + this.x + '</b>'
 
                 $.each(this.points, function(i, point) {
-                    text = point.y
-                    if (i == 3) {
-                        text = convertHashes(point.y)
+                    var value = point.y
+                    if (point.series.name == 'Network hashrate') {
+                        value = convertHashes(point.y)
+                    } else if (point.series.name == 'Size') {
+                        value = fmtNum(point.y) + ' B'
+                    } else if (point.series.name == 'Difficulty') {
+                        value = fmtDifficulty(point.y)
+                    } else {
+                        value = fmtNum(point.y, 2)
                     }
 
-                    s += '<br/><span style="color:' + point.color + '">\u25CF</span>: ' + point.series.name + ': ' + text;
-                });
+                    s += '<br/><span style="color:' + point.color + '">\u25CF</span> ' + point.series.name + ': <b>' + value + '</b>'
+                })
 
-                return s;
-            },
+                return s
+            }
         },
         'plotOptions': {
             'series': {
                 'animation': false,
-                'label': {
-                    'connectorAllowed': true
-                },
-                'marker': {
-                    'enabled': false,
-                    'size': 2
-                }
+                'lineWidth': 2,
+                'marker': { 'enabled': false, 'states': { 'hover': { 'enabled': true, 'radius': 3 } } }
             }
         },
         'series': [{
             'name': 'Difficulty',
-            'data': [].concat(data["diffs"]).reverse(),
+            'data': [].concat(data['diffs']).reverse(),
             'yAxis': 1,
-            'color': '#7cb5ec',
+            'color': colors.diff,
             'type': 'areaspline',
-            'fillOpacity': 0.3
+            'fillOpacity': 0.12
         }, {
             'name': 'Transactions',
-            'data': [].concat(data["txs"]).reverse(),
+            'data': [].concat(data['txs']).reverse(),
             'yAxis': 2,
-            'color': '#90ed7d'
+            'color': colors.txs
         }, {
             'name': 'Size',
-            'data': [].concat(data["sizes"]).reverse(),
+            'data': [].concat(data['sizes']).reverse(),
             'yAxis': 3,
-            'color': '#f7a35c'
+            'color': colors.size
         }, {
             'name': 'Network hashrate',
-            'data': [].concat(data["nethash"]).reverse(),
+            'data': [].concat(data['nethash']).reverse(),
             'yAxis': 4,
-            'color': '#ff2a65'
+            'color': colors.hash
         }],
         'responsive': {
             'rules': [{
-                'condition': {
-                    'maxWidth': 500,
-                },
+                'condition': { 'maxWidth': 500 },
                 'chartOptions': {
-                    'legend': {
-                        'layout': 'horizontal',
-                        'align': 'center',
-                        'verticalAlign': 'bottom'
-                    }
+                    'legend': { 'layout': 'horizontal', 'align': 'center', 'verticalAlign': 'bottom' }
                 }
             }]
         }
-    });
-    $('.highcharts-credits').hide();
+    })
 }

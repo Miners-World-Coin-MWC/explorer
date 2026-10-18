@@ -1,266 +1,247 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
-		
-		
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
-		<script src="https://code.highcharts.com/highcharts.src.js"></script>
-		<script src="https://code.highcharts.com/modules/exporting.js"></script>
-		<script src="https://code.highcharts.com/modules/export-data.js"></script>
-		<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+		<script src="https://code.highcharts.com/11.4.8/highcharts.js"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
-		
+
 		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
-		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap" rel="stylesheet">
-		
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
 		<link rel="stylesheet" href="css/style.css">
-		<link rel="stylesheet" href="css/entypo.css">
-		<title>Blockchain Explorer</title>
-		<meta name="description" content="MinersWorldCoin Blockchain Explorer">
+		<title>Blockchain Explorer | MinersWorldCoin</title>
+		<meta name="description" content="MinersWorldCoin (MWC) blockchain explorer: blocks, transactions, addresses and network stats.">
 
 		<link rel="manifest" href="manifest.json">
-		<meta name="theme-color" content="#000000">
-
+		<meta name="theme-color" content="#0a0e14">
 	</head>
 	<body>
+		<script>
+			(function () {
+				try {
+					var t = localStorage.getItem('mwc-theme');
+					if (t ? t === 'light' : window.matchMedia('(prefers-color-scheme: light)').matches) {
+						document.body.classList.add('light');
+					}
+				} catch (e) {}
+			})();
+		</script>
 		<!-- Navbar -->
-		<nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+		<nav class="navbar fixed-top navbar-expand-lg navbar-dark">
 			<div class="container">
-				<a href="#" class="navbar-brand">
-					<img src="img/mwc.png" width="100" height="100" alt="Logo">
-					<b>Explorer</b>
+				<a href="#/" class="navbar-brand">
+					<img src="img/mwc.png" alt="MWC logo">
+					<span><b>MWC</b> <span class="brand-sub">Explorer</span></span>
 				</a>
 				<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
 				<div class="collapse navbar-collapse" id="navbarResponsive">
-					<ul class="navbar-nav ml-auto">
+					<ul class="navbar-nav ml-auto align-items-lg-center">
 						<li class="nav-item">
-							<a href="#" class="nav-link">Home</a>
+							<a href="#/" class="nav-link active">Explorer</a>
 						</li>
-						<li class="nav-item dropdown" id="wallets">
-                            <a class="nav-link dropdown-toggle" href="#" id="wallets" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Wallets Info
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="wallets">
-                                <a class="dropdown-item" href="webwallet.html">Web Wallet</a>
+						<li class="nav-item">
+							<a href="richlist.html" class="nav-link">Richlist</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Wallets</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<a class="dropdown-item" href="webwallet.html">Web Wallet</a>
 								<a class="dropdown-item" href="walletgen.html">Paper Wallet</a>
-                            </div>
-                        </li>
-						<li class="nav-item dropdown" id="peers">
-                            <a class="nav-link dropdown-toggle" href="#" id="peers" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Peer Info
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="peers">
-                                <a class="dropdown-item" href="addnodes.html">AddNodes - Mainnet</a>
-								<a class="dropdown-item" href="addnodes.html?testnet=1">AddNodes - testnet</a>
-                                <a class="dropdown-item" href="peers.html">Peers - Mainnet</a>
-								<a class="dropdown-item" href="peers.html?testnet=1">Peers - Testnet</a>
-								<a class="dropdown-item" href="peermap.html">PeersMap - Mainnet</a>
-								<a class="dropdown-item" href="peermap.html?testnet=1">PeersMap - Testnet</a>
-                            </div>
-                        </li>
-						<li class="nav-item dropdown" id="miningpools">
-                            <a class="nav-link dropdown-toggle" href="#" id="miningpools" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Mining Pool Info
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="miningpools">
-								<a class="dropdown-item" href="https://bmine.net">BMine</a>
-                                <a class="dropdown-item" href="https://pool.rplant.xyz/#minersworldcoin#connect">Rplant</a>
-                            </div>
-                        </li>
-						<li class="nav-item dropdown" id="exchanges">
-                            <a class="nav-link dropdown-toggle" href="#" id="exchanges" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Exchanges
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="exchanges">
-                                <a class="dropdown-item" href="https://klingex.io/register?ref=5B50F0AE">KlingEx</a>
-								<a class="dropdown-item" href="https://nestex.one/?ref=95B2A537D5A7D49101E29337A9FFD13D">NestEx</a>
-                            </div>
-                        </li>
-						<li class="nav-item">
-							<a href="https://api.minersworld.org" class="nav-link">API</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Network</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<h6 class="dropdown-header">Peers</h6>
+								<a class="dropdown-item" href="peers.html">Mainnet</a>
+								<a class="dropdown-item" href="peers.html?testnet=1">Testnet</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Peer map</h6>
+								<a class="dropdown-item" href="peermap.html">Mainnet</a>
+								<a class="dropdown-item" href="peermap.html?testnet=1">Testnet</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Addnodes</h6>
+								<a class="dropdown-item" href="addnodes.html">Mainnet</a>
+								<a class="dropdown-item" href="addnodes.html?testnet=1">Testnet</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ecosystem</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<h6 class="dropdown-header">Mining pools</h6>
+								<a class="dropdown-item" href="https://bmine.net" target="_blank" rel="noopener">BMine</a>
+								<a class="dropdown-item" href="https://pool.rplant.xyz/#minersworldcoin#connect" target="_blank" rel="noopener">Rplant</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Exchanges</h6>
+								<a class="dropdown-item" href="https://cexius.com" target="_blank" rel="noopener">Cexius</a>
+								<a class="dropdown-item" href="https://nestex.one/?ref=95B2A537D5A7D49101E29337A9FFD13D" target="_blank" rel="noopener">NestEx</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Links</h6>
+								<a class="dropdown-item" href="https://minersworld.org" target="_blank" rel="noopener">Main site</a>
+								<a class="dropdown-item" href="https://mwc-backup.vercel.app/" target="_blank" rel="noopener">Mirror</a>
+								<a class="dropdown-item" href="https://miners-world-coin-mwc.github.io/explorer" target="_blank" rel="noopener">Explorer mirror</a>
+							</div>
 						</li>
 						<li class="nav-item">
-							<a href="https://miners-world-coin-mwc.github.io/explorer" class="nav-link">Explorer</a>
+							<a href="https://api.minersworld.org" class="nav-link" target="_blank" rel="noopener">API</a>
 						</li>
-						<li class="nav-item dropdown" id="website">
-                            <a class="nav-link dropdown-toggle" href="#" id="website" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Website
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="website">
-                                <a class="dropdown-item" href="https://minersworld.org">Main site</a>
-								<a class="dropdown-item" href="https://mwc-backup.vercel.app/">Mirror 1</a>
-                            </div>
-                        </li>
 						<li class="nav-item dropdown" id="network-list">
-							<a class="nav-item nav-link dropdown-toggle" href="#" id="network-versions" data-toggle="dropdown">NETWORK</a>
-						  	<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions" >
-						  	</div>
+							<a class="nav-link dropdown-toggle net-pill" href="#" id="network-versions" data-toggle="dropdown">NETWORK</a>
+							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions"></div>
 						</li>
-						<li class="nav-item">
-							<button id="themeToggle" class="btn btn-sm nav-link" style="border:none;background:none;">
-								🌗
+						<li class="nav-item ml-lg-2">
+							<button id="themeToggle" type="button" class="btn btn-sm" aria-label="Toggle light/dark theme" title="Toggle theme">
+								<i class="fa-solid fa-circle-half-stroke"></i>
 							</button>
 						</li>
 					</ul>
 				</div>
 			</div>
 		</nav>
-		
+
 		<!-- Error message and search -->
 		<div class="container">
-			<div id="error-message" class="alert alert-warning d-none" role="alert">
-				Error, yay ∠( ᐛ 」∠)
+			<div id="error-message" class="alert alert-warning d-none" role="alert"></div>
+
+			<div class="page-head" id="page-head">
+				<h1>MinersWorldCoin Explorer</h1>
+				<p>Search blocks, transactions and addresses on the MWC network.</p>
 			</div>
-			<div class="card mb-3">
-				<div class="card-body">
-					<form id="search-form">
-						<div class="input-group">
-							<input type="text" id="search-field" name="search-field" class="form-control" placeholder="Block, hash, transaction, etc..." aria-label="Recipient's username" aria-describedby="button-addon2">
-							<div class="input-group-append">
-								<button class="btn btn-outline-dark" type="submit" id="button-addon2">Search!</button>
-							</div>
-						</div>
-					</form>
-				</div>
+
+			<div class="search-wrap">
+				<form id="search-form" autocomplete="off">
+					<div class="search-box">
+						<i class="fa-solid fa-magnifying-glass"></i>
+						<input type="text" id="search-field" name="search-field" placeholder="Block, transaction or address" aria-label="Search the blockchain">
+						<button type="submit" id="button-addon2">Search</button>
+					</div>
+				</form>
 			</div>
 		</div>
-	
+
 		<!-- Home page -->
 		<div id="homepage" class="router-page">
 			<div class="container">
-				<div id="charts" class="card mb-3 d-none">
-					<div class="card-body pb-2">
-						<div>
-							<div class="panel-body chart-wrapper" id="network-chart"></div>
-							<div class="text-center small text-success" id="supply">
-								<b>Circulating supply: <span>Loading...</span></b>
-							</div>
-						</div>
+				<div class="stat-grid" id="stat-grid">
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-cube"></i> Block height</div>
+						<div class="stat-value loading" id="stat-height">&ndash;</div>
+						<div class="stat-sub" id="stat-blocktime">&nbsp;</div>
+					</div>
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-gauge-high"></i> Network hashrate</div>
+						<div class="stat-value loading" id="stat-hashrate">&ndash;</div>
+						<div class="stat-sub">Latest block</div>
+					</div>
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-signal"></i> Difficulty</div>
+						<div class="stat-value loading" id="stat-difficulty">&ndash;</div>
+						<div class="stat-sub">Latest block</div>
+					</div>
+					<div class="stat-tile" id="supply" title="Click to refresh">
+						<div class="stat-label"><i class="fa-solid fa-coins"></i> Circulating supply</div>
+						<div class="stat-value loading"><span>&ndash;</span></div>
+						<div class="stat-sub">Click to refresh</div>
 					</div>
 				</div>
-				<!-- <div id="addressContainer">
-					<h1>Address Labels</h1>
-					<div id="addressList"></div>
-					<input type="text" id="addressInput" placeholder="Enter Address">
-					<input type="text" id="labelInput" placeholder="Enter Label">
-					<button id="addLabelBtn">Add Label</button>
-				</div> -->
+
+				<div id="charts" class="card mb-3 d-none">
+					<div class="card-header">Network activity <span class="text-muted" style="font-weight:500">&middot; last 30 blocks</span></div>
+					<div class="card-body">
+						<div class="chart-wrapper" id="network-chart"></div>
+					</div>
+				</div>
+
+				<div class="section-title">
+					<span>Latest blocks</span>
+					<small><span class="live-dot"></span> Live &middot; updates every 10s</small>
+				</div>
 				<div class="card mb-3">
 					<div class="table-responsive">
-						<table id="blocks-table" class="table table-borderless table-md table-striped text-center mb-0">
+						<table id="blocks-table" class="table table-hover mb-0">
 							<thead>
 								<tr>
 									<th scope="col">Height</th>
-									<th scope="col">Time</th>
+									<th scope="col">Age</th>
 									<th scope="col">Hash</th>
-									<th scope="col">Transactions</th>
+									<th scope="col" class="col-num">Txs</th>
 								</tr>
 							</thead>
 							<tbody>
-								
+								<tr class="skeleton-row"><td><span class="skeleton" style="width:70px"></span></td><td><span class="skeleton" style="width:90px"></span></td><td><span class="skeleton"></span></td><td><span class="skeleton" style="width:24px"></span></td></tr>
+								<tr class="skeleton-row"><td><span class="skeleton" style="width:70px"></span></td><td><span class="skeleton" style="width:90px"></span></td><td><span class="skeleton"></span></td><td><span class="skeleton" style="width:24px"></span></td></tr>
+								<tr class="skeleton-row"><td><span class="skeleton" style="width:70px"></span></td><td><span class="skeleton" style="width:90px"></span></td><td><span class="skeleton"></span></td><td><span class="skeleton" style="width:24px"></span></td></tr>
+								<tr class="skeleton-row"><td><span class="skeleton" style="width:70px"></span></td><td><span class="skeleton" style="width:90px"></span></td><td><span class="skeleton"></span></td><td><span class="skeleton" style="width:24px"></span></td></tr>
+								<tr class="skeleton-row"><td><span class="skeleton" style="width:70px"></span></td><td><span class="skeleton" style="width:90px"></span></td><td><span class="skeleton"></span></td><td><span class="skeleton" style="width:24px"></span></td></tr>
 							</tbody>
 						</table>
 					</div>
 				</div>
-			</div>	
-			
+			</div>
+
 			<div class="flex-center">
-				<button id="more" style="width: 190px;" class="btn btn-outline-dark mb-3 load-btn">
-					Load more
-				</button>
+				<button id="more" type="button" class="btn btn-outline-dark mb-3 load-btn">Load more blocks</button>
 			</div>
 		</div>
-	
+
 		<!-- Block page -->
 		<div id="block" class="router-page">
 			<div class="container">
-				<div id="block-info-table">
-					
-				</div>
+				<div id="block-info-table"></div>
+				<div class="section-title" id="block-tx-title" style="display:none"><span>Transactions</span></div>
 				<div id="block-transactions" class="mb-3"></div>
 			</div>
 
 			<div class="flex-center">
-				<button id="more-block-transactions" style="width: 190px;" class="btn btn-outline-dark mb-3 load-btn d-none">
-					Load more
-				</button>
+				<button id="more-block-transactions" type="button" class="btn btn-outline-dark mb-3 load-btn d-none">Load more transactions</button>
 			</div>
 		</div>
-	
+
 		<!-- Transaction page -->
 		<div id="transaction" class="router-page">
 			<div class="container">
-				<div id="tx-info-table">
-					
-				</div>
-				<div class="card mb-3" id="tx-info-vout-total">
-					<div class="card-header">
-						Outputs: <b>0</b>
-					</div>
-					<div class="card-body">
-						<div class="list-group">
-						  	<div id="tx-vout-list">
+				<div id="tx-info-table"></div>
 
-						  	</div>
-						</div>
-					</div>
+				<div class="card mb-3 d-none" id="tx-info-vin-total">
+					<div class="card-header">Inputs <span class="pill ml-1" id="tx-vin-count">0</span></div>
+					<div class="list-group" id="tx-vin-list"></div>
 				</div>
-				<div class="card mb-3" id="tx-info-vin-total">
-					<div class="card-header">
-						Inputs: <b>0</b>
-					</div>
-					<div class="card-body">
-						<div class="list-group">
-						  	<div id="tx-vin-list">
-						  		
-						  	</div>
-						</div>
-					</div>
+
+				<div class="card mb-3 d-none" id="tx-info-vout-total">
+					<div class="card-header">Outputs <span class="pill ml-1" id="tx-vout-count">0</span></div>
+					<div class="list-group" id="tx-vout-list"></div>
 				</div>
 			</div>
 		</div>
-	
+
 		<!-- Address page -->
 		<div id="address" class="router-page">
 			<div class="container">
-				<div id="address-info-table">
-					
-				</div>
-				<div class="card mb-3" id="address-history">
-					<div class="card-header">
-						Transactions: <b>0</b>
-					</div>
-					<div class="card-body">
-						<div class="list-group">
-						  	<div id="address-history-list">
-						  		
-						  	</div>
-						</div>
-					</div>
-				</div>
+				<div id="address-info-table"></div>
+				<div class="section-title" id="address-tx-title" style="display:none"><span>Transactions</span></div>
 				<div id="address-transactions" class="mb-3"></div>
 			</div>
 
 			<div class="flex-center">
-				<button id="more-address-transactions" style="width: 190px;" class="btn btn-outline-dark mb-3 load-btn d-none">
-					Load more
-				</button>
+				<button id="more-address-transactions" type="button" class="btn btn-outline-dark mb-3 load-btn d-none">Load more transactions</button>
 			</div>
 		</div>
-		
+
 		<!-- QR code modal window -->
 		<div id="qrModal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-dialog" role="document">
+			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
 						<div class="col-10" style="word-wrap: break-word;">
@@ -279,66 +260,26 @@
 			</div>
 		</div>
 
-		<!-- Footer :3 -->
-		<footer class="mb-3">
-			<div class="container text-center text-light">
-
-				<div class="mb-2">
-				Made with ❤️ by
-				<a
-					target="_blank"
-					rel="noopener"
-					href="https://github.com/Miners-World-Coin-MWC"
-				>
-					MinersWorldCoin Team
-				</a>
+		<!-- Footer -->
+		<footer>
+			<div class="container text-center">
+				<div class="social-links mb-3">
+					<a href="https://discord.gg/5HZGx5bbKK" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+					<a href="https://t.me/+0IfF9E76ETZiNDQ8" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+					<a href="https://www.reddit.com/r/MinersWorldCoin/" target="_blank" rel="noopener" aria-label="Reddit"><i class="fab fa-reddit"></i></a>
+					<a href="https://x.com/minerworldcoin" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-x-twitter"></i></a>
 				</div>
-
-				<!-- Social links -->
-				<div class="social-links mt-3">
-				<a
-					href="https://discord.gg/5HZGx5bbKK"
-					target="_blank"
-					rel="noopener"
-					aria-label="Discord"
-				>
-					<i class="fab fa-discord"></i>
-				</a>
-
-				<a
-					href="https://t.me/+0IfF9E76ETZiNDQ8"
-					target="_blank"
-					rel="noopener"
-					aria-label="Telegram"
-				>
-					<i class="fab fa-telegram"></i>
-				</a>
-
-				<a
-					href="https://www.reddit.com/r/MinersWorldCoin/"
-					target="_blank"
-					rel="noopener"
-					aria-label="Reddit"
-				>
-					<i class="fab fa-reddit"></i>
-				</a>
-
-				<a
-					href="https://x.com/minerworldcoin"
-					target="_blank"
-					rel="noopener"
-					aria-label="X"
-				>
-					<i class="fab fa-x-twitter"></i>
-				</a>
+				<div>
+					&copy; <span id="year"></span> <a target="_blank" rel="noopener" href="https://github.com/Miners-World-Coin-MWC">MinersWorldCoin Team</a>
+					&middot; <a href="https://api.minersworld.org" target="_blank" rel="noopener">API</a>
 				</div>
-
 			</div>
 		</footer>
 
-		<!-- All magic is here :D -->
+		<!-- Scripts -->
 		<script src="js/config.js"></script>
 		<script src="js/errorMessages.js"></script>
+		<script src="js/ui.js"></script>
 		<script src="js/charts.js"></script>
 		<script src="js/convertHashes.js"></script>
 		<script src="js/displayDocs.js"></script>
@@ -349,7 +290,6 @@
 		<script src="js/displayBlock.js"></script>
 		<script src="js/displayBlockInfo.js"></script>
 		<script src="js/addressLabels.js"></script>
-		<script src="js/displayTransactionInfo.js"></script>
 		<script src="js/showQrModal.js"></script>
 		<script src="js/displayAddressInfo.js"></script>
 		<script src="js/parseTransactionDetails.js"></script>
@@ -360,7 +300,6 @@
 		<script src="js/displayTxVin.js"></script>
 		<script src="js/displayHistory.js"></script>
 		<script src="js/displayHome.js"></script>
-		<script src="js/loadPeers.js"></script>
 		<script src="js/amountFormat.js"></script>
 		<script src="js/timeFormat.js"></script>
 		<script src="js/toggle.js"></script>
