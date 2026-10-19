@@ -157,6 +157,32 @@
 					</div>
 				</div>
 
+				<div id="burn-section" class="card burn-card mb-3 d-none">
+					<div class="card-header burn-head">
+						<span><i class="fa-solid fa-fire"></i> Burned coins</span>
+						<a id="burn-address-link" href="#/">View burn address &rarr;</a>
+					</div>
+					<div class="balance-hero">
+						<div>
+							<div class="stat-label">Total burned</div>
+							<div class="stat-value loading" id="burn-total">&ndash;</div>
+						</div>
+						<div>
+							<div class="stat-label">Share of supply</div>
+							<div class="stat-value loading" id="burn-share">&ndash;</div>
+						</div>
+						<div>
+							<div class="stat-label">Burn transactions</div>
+							<div class="stat-value loading" id="burn-count">&ndash;</div>
+						</div>
+					</div>
+					<div class="burn-recent">
+						<div class="tx-col-title">Latest burns</div>
+						<div class="list-group" id="burn-recent-list"></div>
+						<a href="#/" class="io-show-all list-group-item list-group-item-action d-none" id="burn-all-link"></a>
+					</div>
+				</div>
+
 				<div id="charts" class="card mb-3 d-none">
 					<div class="card-header">Network activity <span class="text-muted" style="font-weight:500">&middot; last 30 blocks</span></div>
 					<div class="card-body">
@@ -299,6 +325,7 @@
 		<script src="js/displayTxVout.js"></script>
 		<script src="js/displayTxVin.js"></script>
 		<script src="js/displayHistory.js"></script>
+		<script src="js/displayBurn.js"></script>
 		<script src="js/displayHome.js"></script>
 		<script src="js/amountFormat.js"></script>
 		<script src="js/timeFormat.js"></script>

@@ -1257,3 +1257,11 @@ body:not(.light) .leaflet-container { background: #0b1018; }
 .note-box { background: var(--accent-bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 14px; color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
 
 .io-show-all { text-align: center; font-weight: 600; color: var(--accent-soft); }
+
+/* ---- Burned coins ---- */
+.burn-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.burn-head .fa-fire { color: var(--accent); margin-right: 6px; }
+.burn-head a { font-size: 12.5px; font-weight: 500; }
+.burn-card .balance-hero { border-bottom: 0; }
+.burn-recent { border-top: 1px solid var(--border-soft); }
+.burn-recent .list-group-item:last-child { border-bottom: 0; }

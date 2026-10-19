@@ -7,6 +7,7 @@ function displayHome() {
         $('#supply .stat-value').removeClass('loading').find('span').text(fmtNum(supply))
         $('#supply .stat-sub').text(getApi()['ticker'] + ' · click to refresh')
         $('#stat-height').removeClass('loading').text(fmtNum(height))
+        displayBurn(data.result.supply, height)
 
         // Only reload the table when there is a new block
         if (height != display_height) {

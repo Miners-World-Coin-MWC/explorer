@@ -6,7 +6,7 @@ const addressLabels = {
     "94LcpGmThCmDZCULFkvxckk9HQHtyGPBV3": "Charity Wallet",
     "9EK54xP6jKMzrWTf32YD7wetkAVCyFJViP": "Listing Fee Wallet",
     "9FjHgGtKj7Y7XabpqGPAPvUuUjQ29TE5is": "Staff Payment Wallet (UNCLAIMED)",
-    "9BuRnXTZBMvVVRW5GtP1KxkYd22QKmtNuW": "Burned Coins Wallet",
+    "9BuRnXTZBMvVVRW5GtP1KxkYd22QKmtNuW": "Burn Address",
     // // Pool addresses
     // "AREstbeSFzzbMGToUF6E2i3DbPa5nJB4Lz": "NovaGrid",
     // "Ae5vqtfRFKWYVfgCzyR4iat8FuKfLH4jve": "Coin-Miners",

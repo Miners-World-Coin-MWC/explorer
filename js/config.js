@@ -5,7 +5,8 @@ var networksConfigs = {
         'api': 'https://api.minersworld.org',
         'ticker': 'MWC',
         'decimals': 8,
-        'hrp': 'mwc'
+        'hrp': 'mwc',
+        'burnAddress': '9BuRnXTZBMvVVRW5GtP1KxkYd22QKmtNuW'
     },
     'TMWC': {
         'name': 'Test Network (TMWC)',
