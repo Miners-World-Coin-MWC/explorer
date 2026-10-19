@@ -2,7 +2,8 @@ name: Update richlist
 
 on:
   schedule:
-    - cron: '*/30 * * * *'     # every 30 minutes (GitHub may delay scheduled runs a few minutes)
+    # Every 30 minutes, but NOT at :00/:30 - GitHub delays or drops scheduled runs at the top of the hour when it is busy
+    - cron: '7,37 * * * *'
   workflow_dispatch:           # "Run workflow" button in the Actions tab
 
 permissions:
@@ -37,3 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash tools/publish-richlist.sh
+
+      - name: Summary
+        if: always()
+        run: node tools/ci-summary.js >> "$GITHUB_STEP_SUMMARY"

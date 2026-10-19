@@ -1255,3 +1255,5 @@ body:not(.light) .leaflet-container { background: #0b1018; }
 .tx-unavailable i { color: var(--accent); margin-right: 6px; }
 .tx-unavailable .tx-retry { white-space: nowrap; font-weight: 600; }
 .note-box { background: var(--accent-bg); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 10px 14px; color: var(--text-muted); font-size: 13px; margin-bottom: 16px; }
+
+.io-show-all { text-align: center; font-weight: 600; color: var(--accent-soft); }

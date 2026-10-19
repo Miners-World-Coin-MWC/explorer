@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 # Publishes data/richlist.json + the resume state to the data branch as a SINGLE commit
 # (force-pushed, so the repository never grows with history of snapshots).
+# Never overwrites a branch that is already further ahead than this run.
 # Used by the GitHub Action, and can be run by hand to seed the branch from a local crawl:
 #   REMOTE_URL=git@github.com:YOUR-ORG/explorer.git bash tools/publish-richlist.sh
 set -euo pipefail
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$here/lib-state.sh"
+
 BRANCH="${BRANCH:-richlist-data}"
 REMOTE_URL="${REMOTE_URL:-https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git}"
 
@@ -12,6 +16,18 @@ for f in .richlist-state.json richlist.json; do
   if [ -f "data/$f" ]; then cp "data/$f" "$pub/$f"; fi
 done
 if [ ! -f "$pub/.richlist-state.json" ]; then echo "Nothing to publish."; exit 0; fi
+
+# Safety: if the branch already holds a more advanced crawl (e.g. you seeded it while this run was busy), keep it.
+if git ls-remote --exit-code --heads "$REMOTE_URL" "$BRANCH" >/dev/null 2>&1; then
+  chk="$(mktemp -d)"
+  git clone -q --depth 1 --branch "$BRANCH" "$REMOTE_URL" "$chk"
+  remote_h="$(state_height "$chk/.richlist-state.json")"
+  local_h="$(state_height "$pub/.richlist-state.json")"
+  if [ "$remote_h" -gt "$local_h" ]; then
+    echo "The '$BRANCH' branch is already ahead (block $remote_h vs this run's $local_h) - not overwriting it."
+    exit 0
+  fi
+fi
 
 cd "$pub"
 git init -q -b "$BRANCH"

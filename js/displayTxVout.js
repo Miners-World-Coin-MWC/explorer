@@ -28,6 +28,8 @@ function displayTxVout(vout_list, fee = 0) {
         }
     })
 
+    collapseList('#tx-vout-list', '[data-tx-vout-index]', 50)
+
     if (fee > 0) {
         $('#tx-vout-list').append(`
             <div class="list-group-item io-fee">

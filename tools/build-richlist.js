@@ -21,6 +21,7 @@
  *   --top <n>              addresses kept in the output file (default 5000)
  *   --confirmations <n>    stay this many blocks behind the tip to avoid reorgs (default 10)
  *   --timeout <sec>        per-request timeout (default 30)
+ *   --slow-timeout <sec>   patience for ONE extra attempt on very large transactions that time out normally (default 150)
  *   --strict               stop on the first transaction the API cannot return (default: skip it, record it, carry on)
  *   --retry-skipped        re-try transactions skipped by earlier runs (their balance changes are applied if they now load)
  *   --max-minutes <n>      stop cleanly after n minutes and save progress (for CI jobs with a time limit)
@@ -53,9 +54,10 @@ const CONFIRMATIONS = parseInt(opt.confirmations || 10, 10)
 const MAX_BLOCKS = opt['max-blocks'] ? parseInt(opt['max-blocks'], 10) : Infinity
 const MAX_MINUTES = opt['max-minutes'] ? parseFloat(opt['max-minutes']) : Infinity
 const TIMEOUT = Math.round(parseFloat(opt.timeout || 30) * 1000)
+const SLOW_TIMEOUT = Math.round(parseFloat(opt['slow-timeout'] || 150) * 1000)
 const STRICT = !!opt.strict
-const TX_TRIES = 5          // a transaction the API cannot serve is given up on after this many attempts
-const MAX_CONSECUTIVE_FAILURES = 20   // this many different requests failing in a row = the API is down, stop and resume later
+const TX_TRIES = 3          // a transaction the API cannot serve is given up on after this many attempts
+const MAX_CONSECUTIVE_FAILURES = 10   // this many different requests failing in a row = the API is down, stop and resume later
 const RANGE = 30          // blocks per /range request
 const SAVE_EVERY = 20     // batches between checkpoints
 
@@ -63,11 +65,11 @@ const SAVE_EVERY = 20     // batches between checkpoints
 let requestCount = 0
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
-async function get(endpoint, tries = 7) {
+async function get(endpoint, tries = 7, timeoutMs = TIMEOUT) {
     let lastErr
     for (let attempt = 0; attempt < tries; attempt++) {
         const ctrl = new AbortController()
-        const timer = setTimeout(() => ctrl.abort(), TIMEOUT)
+        const timer = setTimeout(() => ctrl.abort(), timeoutMs)
         try {
             requestCount++
             const res = await fetch(API + endpoint, { signal: ctrl.signal, headers: { accept: 'application/json' } })
@@ -173,12 +175,18 @@ async function getTxIds(block) {
 let pendingSkipped = []
 let consecutiveFailures = 0
 
-function skipTx(txid, height, reason, outage) {
+async function skipTx(txid, height, reason) {
     if (height === 0) return null // genesis coinbase is usually not retrievable, and is unspendable anyway
     if (STRICT) throw new Error(`transaction lookup failed: ${txid} (${reason})`)
-    if (outage && ++consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-        throw new Error(`${MAX_CONSECUTIVE_FAILURES} requests in a row failed - the API looks unavailable. Progress is saved; run again later to resume.`)
+
+    // Is the API still alive? A few huge transactions timing out is normal; the whole API being down is not.
+    let alive = true
+    try { await get('/info', 2, 8000) } catch (e) { alive = false }
+    if (!alive && ++consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+        throw new Error(`the API stopped responding (${MAX_CONSECUTIVE_FAILURES} failures in a row). Progress is saved; run again later to resume.`)
     }
+    if (alive) consecutiveFailures = 0
+
     console.warn(`  ! skipping transaction ${txid} (block ${height}): ${reason}`)
     pendingSkipped.push({ txid, height, reason })
     return null
@@ -190,11 +198,20 @@ async function getTxDelta(txid, height) {
     try {
         data = await get(`/transaction/${txid}`, TX_TRIES)
     } catch (e) {
-        return skipTx(txid, height, e.message.replace(/^Request failed after retries: \S+ /, ''), true)
+        if (/abort|timed? ?out|timeout/i.test(e.message)) {
+            // Probably a very large transaction (1000+ inputs): give it one patient attempt
+            try {
+                data = await get(`/transaction/${txid}`, 1, SLOW_TIMEOUT)
+            } catch (e2) {
+                return skipTx(txid, height, `no answer even after ${Math.round(SLOW_TIMEOUT / 1000)}s (very large transaction?)`)
+            }
+        } else {
+            return skipTx(txid, height, e.message.replace(/^Request failed after retries: \S+ /, ''))
+        }
     }
     if (data.error || !data.result) {
         // a clean "not found" answer is a data gap, not an outage
-        return skipTx(txid, height, 'API answered: ' + JSON.stringify(data.error || data).slice(0, 80), false)
+        return skipTx(txid, height, 'API answered: ' + JSON.stringify(data.error || data).slice(0, 80))
     }
     consecutiveFailures = 0
 

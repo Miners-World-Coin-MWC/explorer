@@ -20,4 +20,6 @@ function displayTxVin(vin_list) {
                 </div>`)
         }
     })
+
+    collapseList('#tx-vin-list', '[data-tx-vin-index]', 50)
 }

@@ -91,3 +91,19 @@ $(document).on('click', '.tx-retry', function(e) {
     card.find('.tx-unavailable').remove()
     loadTransactions(card.parent())
 })
+
+// Very large transactions (1000+ inputs): show the first rows and fold the rest behind a button
+function collapseList(list, itemSelector, limit) {
+    var items = $(list).find(itemSelector)
+    if (items.length <= limit) return
+    items.slice(limit).addClass('d-none io-extra')
+    $(list).find('.io-show-all').remove()
+    items.last().after('<a href="#" class="list-group-item list-group-item-action io-show-all">Show all ' +
+        fmtNum(items.length) + ' (' + fmtNum(items.length - limit) + ' more)</a>')
+}
+
+$(document).on('click', '.io-show-all', function(e) {
+    e.preventDefault()
+    $(this).closest('.list-group').find('.io-extra').removeClass('d-none io-extra')
+    $(this).remove()
+})
