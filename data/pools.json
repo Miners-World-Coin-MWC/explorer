@@ -1,0 +1,25 @@
+{
+  "_help": "pools: map a block-reward address to a pool name (several addresses can share one name). ignore: addresses that get a fee output in every coinbase and must not be counted as the miner.",
+  "pools": {
+    "95iw269AkikMES6UcdC8xfHNqJXdXSxDzf": {
+      "name": "RPlant",
+      "url": "https://pool.rplant.xyz/#minersworldcoin#connect"
+    },
+    "9SVovgTSYgXZhMmzZ9QvZdfrHysTT9PhGf": {
+      "name": "RPlant",
+      "url": "https://pool.rplant.xyz/#minersworldcoin#connect"
+    },
+    "9B2gbgze1Ucwmcba87hU4GSH9FV3r173Vw": {
+      "name": "BMine",
+      "url": "https://bmine.net"
+    }
+  },
+  "ignore": [
+    "98AUvgXPjAdKHj3FqwAPJNpd8XergXBL59",
+    "9Pt3nFwZhWWxN9BrQZrUEYQtgZaDdrxyVi",
+    "9Dt3g2g5AWDhBDyXhfwXE7gGEJsQd6vdzW",
+    "94LcpGmThCmDZCULFkvxckk9HQHtyGPBV3",
+    "9EK54xP6jKMzrWTf32YD7wetkAVCyFJViP",
+    "9FjHgGtKj7Y7XabpqGPAPvUuUjQ29TE5is"
+  ]
+}

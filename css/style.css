@@ -1265,3 +1265,15 @@ body:not(.light) .leaflet-container { background: #0b1018; }
 .burn-card .balance-hero { border-bottom: 0; }
 .burn-recent { border-top: 1px solid var(--border-soft); }
 .burn-recent .list-group-item:last-child { border-bottom: 0; }
+
+/* ---- Mining pools page ---- */
+.pl-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.window-tabs { display: inline-flex; gap: 4px; padding: 3px; background: var(--bg-input); border: 1px solid var(--border-soft); border-radius: 10px; }
+.win-btn { background: transparent; border: 0; color: var(--text-muted); font-size: 12.5px; font-weight: 600; padding: 4px 12px; border-radius: 7px; cursor: pointer; }
+.win-btn:hover { color: var(--text-main); }
+.win-btn.active { background: var(--bg-card); color: var(--accent-soft); box-shadow: 0 0 0 1px var(--border-strong); }
+.pool-link { margin-left: 6px; font-size: 11px; color: var(--text-faint); }
+.pool-link:hover { color: var(--accent); }
+.pl-foot { font-size: 12.5px; margin-bottom: 8px; }
+@media (max-width: 767.98px) { .pl-hide-sm { display: none; } }
+.burn-view-all { text-align: center; font-weight: 600; color: var(--accent-soft); }

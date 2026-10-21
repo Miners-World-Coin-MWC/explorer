@@ -11,6 +11,8 @@ const addressLabels = {
     // "AREstbeSFzzbMGToUF6E2i3DbPa5nJB4Lz": "NovaGrid",
     // "Ae5vqtfRFKWYVfgCzyR4iat8FuKfLH4jve": "Coin-Miners",
     "95iw269AkikMES6UcdC8xfHNqJXdXSxDzf": "RPlant",
+    "9SVovgTSYgXZhMmzZ9QvZdfrHysTT9PhGf": "RPlant",
+    "9B2gbgze1Ucwmcba87hU4GSH9FV3r173Vw": "BMine",
     // "AKeNU8umLeCy4ZDJP5fkqM69VQEg4ydhka": "EvePool",
     // "AVayH8jK94vSHoden4UFjwnWqPGSEQvYpf": "ZergPool"
 };

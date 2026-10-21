@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+		<link rel="stylesheet" href="css/style.css">
+		<title>Mining Pools | MinersWorldCoin Explorer</title>
+		<meta name="description" content="Which mining pools and miners are finding MinersWorldCoin (MWC) blocks.">
+
+		<meta name="theme-color" content="#0a0e14">
+	</head>
+	<body>
+		<script>
+			(function () {
+				try {
+					var t = localStorage.getItem('mwc-theme');
+					if (t ? t === 'light' : window.matchMedia('(prefers-color-scheme: light)').matches) {
+						document.body.classList.add('light');
+					}
+				} catch (e) {}
+			})();
+		</script>
+		<!-- Navbar -->
+		<nav class="navbar fixed-top navbar-expand-lg navbar-dark">
+			<div class="container">
+				<a href="index.html" class="navbar-brand">
+					<img src="img/mwc.png" alt="MWC logo">
+					<span><b>MWC</b> <span class="brand-sub">Pools</span></span>
+				</a>
+				<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+					<ul class="navbar-nav ml-auto align-items-lg-center">
+						<li class="nav-item">
+							<a href="index.html" class="nav-link">Explorer</a>
+						</li>
+						<li class="nav-item">
+							<a href="richlist.html" class="nav-link">Richlist</a>
+						</li>
+						<li class="nav-item">
+							<a href="pools.html" class="nav-link active">Pools</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Wallets</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<a class="dropdown-item" href="webwallet.html">Web Wallet</a>
+								<a class="dropdown-item" href="walletgen.html">Paper Wallet</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Network</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<h6 class="dropdown-header">Peers</h6>
+								<a class="dropdown-item" href="peers.html">Mainnet</a>
+								<a class="dropdown-item" href="peers.html?testnet=1">Testnet</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Peer map</h6>
+								<a class="dropdown-item" href="peermap.html">Mainnet</a>
+								<a class="dropdown-item" href="peermap.html?testnet=1">Testnet</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Addnodes</h6>
+								<a class="dropdown-item" href="addnodes.html">Mainnet</a>
+								<a class="dropdown-item" href="addnodes.html?testnet=1">Testnet</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ecosystem</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<h6 class="dropdown-header">Mining pools</h6>
+								<a class="dropdown-item" href="https://bmine.net" target="_blank" rel="noopener">BMine</a>
+								<a class="dropdown-item" href="https://pool.rplant.xyz/#minersworldcoin#connect" target="_blank" rel="noopener">Rplant</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Exchanges</h6>
+								<a class="dropdown-item" href="https://cexius.com" target="_blank" rel="noopener">Cexius</a>
+								<a class="dropdown-item" href="https://nestex.one/?ref=95B2A537D5A7D49101E29337A9FFD13D" target="_blank" rel="noopener">NestEx</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Links</h6>
+								<a class="dropdown-item" href="https://minersworld.org" target="_blank" rel="noopener">Main site</a>
+								<a class="dropdown-item" href="https://mwc-backup.vercel.app/" target="_blank" rel="noopener">Mirror</a>
+								<a class="dropdown-item" href="https://miners-world-coin-mwc.github.io/explorer" target="_blank" rel="noopener">Explorer mirror</a>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="https://api.minersworld.org" class="nav-link" target="_blank" rel="noopener">API</a>
+						</li>
+						<li class="nav-item ml-lg-2">
+							<button id="themeToggle" type="button" class="btn btn-sm" aria-label="Toggle light/dark theme" title="Toggle theme">
+								<i class="fa-solid fa-circle-half-stroke"></i>
+							</button>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container">
+			<div class="page-head">
+				<h1>Mining pools <span id="net-badge" class="pill" style="vertical-align:middle;font-size:12px"></span></h1>
+				<p>Who is finding blocks on the MWC network, worked out from the blockchain itself.</p>
+			</div>
+
+			<div id="pl-empty" class="card d-none mb-3">
+				<div class="card-body text-center">
+					<p class="mb-2"><b>Pool statistics haven't been generated yet.</b></p>
+					<p class="text-muted mb-0">Run <code>node tools/build-poolstats.js</code> and upload <code>data/poolstats.json</code> next to this page.</p>
+				</div>
+			</div>
+
+			<div id="pl-content" class="d-none">
+				<div id="pl-note" class="note-box d-none"></div>
+
+				<div class="stat-grid">
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-cubes"></i> Blocks analysed</div>
+						<div class="stat-value" id="pl-blocks">&ndash;</div>
+						<div class="stat-sub" id="pl-span">&nbsp;</div>
+					</div>
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-users-gear"></i> Distinct miners</div>
+						<div class="stat-value" id="pl-miners">&ndash;</div>
+						<div class="stat-sub">Reward addresses</div>
+					</div>
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-trophy"></i> Largest</div>
+						<div class="stat-value" id="pl-top">&ndash;</div>
+						<div class="stat-sub" id="pl-top-name">&nbsp;</div>
+					</div>
+					<div class="stat-tile">
+						<div class="stat-label"><i class="fa-solid fa-clock-rotate-left"></i> Snapshot</div>
+						<div class="stat-value" id="pl-updated">&ndash;</div>
+						<div class="stat-sub" id="pl-height">&nbsp;</div>
+					</div>
+				</div>
+
+				<div class="card mb-3">
+					<div class="card-header pl-head">
+						<span>Share of blocks</span>
+						<div class="window-tabs" id="pl-windows"></div>
+					</div>
+					<div class="card-body">
+						<div class="dist-bar" id="pl-dist"></div>
+						<div class="dist-legend" id="pl-legend"></div>
+					</div>
+				</div>
+
+				<div class="section-title"><span>Pools and miners</span><small id="pl-table-note"></small></div>
+				<div class="card mb-3">
+					<div class="table-responsive">
+						<table class="table table-hover mb-0" id="pl-table">
+							<thead>
+								<tr>
+									<th scope="col">#</th>
+									<th scope="col">Pool / miner</th>
+									<th scope="col" class="col-num">Blocks</th>
+									<th scope="col" class="col-num">Share</th>
+									<th scope="col" class="col-num pl-hide-sm">Est. hashrate</th>
+									<th scope="col" class="pl-hide-sm">Last block</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="section-title"><span>Latest blocks</span><small>Who found them</small></div>
+				<div class="card mb-3">
+					<div class="list-group" id="pl-recent"></div>
+				</div>
+
+				<p class="text-muted pl-foot">Pools are identified by the address that receives the block reward. Addresses without a name are shown as unlabelled; to name one, add it to <code>data/pools.json</code>. Hashrate is an estimate: the share of blocks multiplied by the network hashrate.</p>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<footer>
+			<div class="container text-center">
+				<div class="social-links mb-3">
+					<a href="https://discord.gg/5HZGx5bbKK" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+					<a href="https://t.me/+0IfF9E76ETZiNDQ8" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+					<a href="https://www.reddit.com/r/MinersWorldCoin/" target="_blank" rel="noopener" aria-label="Reddit"><i class="fab fa-reddit"></i></a>
+					<a href="https://x.com/minerworldcoin" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-x-twitter"></i></a>
+				</div>
+				<div>
+					&copy; <span id="year"></span> <a target="_blank" rel="noopener" href="https://github.com/Miners-World-Coin-MWC">MinersWorldCoin Team</a>
+					&middot; <a href="https://api.minersworld.org" target="_blank" rel="noopener">API</a>
+				</div>
+			</div>
+		</footer>
+		<script>document.getElementById("year").textContent = new Date().getFullYear()</script>
+
+		<script src="js/addressLabels.js"></script>
+		<script src="js/convertHashes.js"></script>
+		<script src="js/timeFormat.js"></script>
+		<script src="js/toggle.js"></script>
+		<script src="js/pools.js"></script>
+	</body>
+</html>

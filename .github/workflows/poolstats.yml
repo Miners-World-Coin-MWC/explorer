@@ -1,0 +1,39 @@
+name: Update pool stats
+
+on:
+  schedule:
+    - cron: '22,52 * * * *'    # every 30 minutes, off the busy :00/:30 marks (GitHub may still delay runs a little)
+  workflow_dispatch:           # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write              # needed to push the poolstats-data branch
+
+concurrency:
+  group: poolstats
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BRANCH: poolstats-data
+      STATE_NAME: poolstats.json
+      OUT_NAME: poolstats.json
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore previous snapshot
+        run: bash tools/restore-richlist.sh
+
+      - name: Build pool stats
+        # recent blocks first (a few minutes), then the full history in 22-minute slices until it reaches block 0; afterwards only new blocks
+        run: node tools/build-poolstats.js --max-minutes 22
+
+      - name: Publish
+        run: bash tools/publish-richlist.sh

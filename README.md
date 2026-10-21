@@ -59,3 +59,29 @@ which holds the resume file `data/.richlist-state.json`). The workflow starts by
 absent it simply does the first crawl itself.
 
 The first crawl, if the workflow has to do it, runs in chunks of up to 330 minutes per run.
+
+## Mining pool stats
+`pools.html` shows which pools and miners are finding blocks. There are no pool APIs and no database: the builder reads the
+coinbase transaction of each block through the existing API and records which address received the block reward.
+
+It keeps two things in `poolstats.json`: a rolling window of the most recent blocks (default 2000) and an all-time tally per
+reward address covering every block back to the genesis block. The recent blocks are read first, then the history is filled in
+backwards; it can be stopped and resumed at any time.
+
+```bash
+node tools/build-poolstats.js                 # recent blocks first (minutes), then the whole history (hours); later runs only add new blocks
+node tools/build-poolstats.js --skip-history  # recent window only
+node tools/build-poolstats.js --window 5000   # keep a longer recent window
+```
+
+`.github/workflows/poolstats.yml` runs it every 30 minutes (in 22-minute slices, so the history scan simply continues over several
+runs) and publishes `poolstats.json` to a single-commit `poolstats-data` branch (separate from the richlist branch). The page reads it
+from there (URL derived automatically on `*.github.io`, otherwise edit `REMOTE_URL` in `js/pools.js`) and falls back to
+`data/poolstats.json`. To skip the wait, run the script once on your own machine and upload `data/poolstats.json` in the repo's
+`data` folder: the workflow continues from whichever copy has scanned the most blocks.
+
+Naming pools: edit `data/pools.json`.
+- `pools` maps a reward address to a pool name (and optional website). Several addresses can share one name and are shown as one row.
+- `ignore` lists fee addresses that every coinbase pays (dev fee etc.) so they are never mistaken for the miner.
+Addresses with no name show as "Unlabelled" on the page; address labels from `js/addressLabels.js` are used as a fallback.
+Name changes apply to the whole history immediately because names are looked up when the page renders.
