@@ -163,11 +163,11 @@
 						<table class="table table-hover mb-0" id="pl-table">
 							<thead>
 								<tr>
-									<th scope="col">#</th>
+									<th scope="col" class="pl-hide-sm">#</th>
 									<th scope="col">Pool / miner</th>
-									<th scope="col" class="col-num">Blocks</th>
+									<th scope="col" class="col-num pl-hide-sm">Blocks</th>
 									<th scope="col" class="col-num">Share</th>
-									<th scope="col" class="col-num pl-hide-sm">Est. hashrate</th>
+									<th scope="col" class="col-num" title="Each pool's share of recent blocks multiplied by the network hashrate">Est. hashrate</th>
 									<th scope="col" class="pl-hide-sm">Last block</th>
 								</tr>
 							</thead>
@@ -181,7 +181,7 @@
 					<div class="list-group" id="pl-recent"></div>
 				</div>
 
-				<p class="text-muted pl-foot">Pools are identified by the address that receives the block reward. Addresses without a name are shown as unlabelled; to name one, add it to <code>data/pools.json</code>. Hashrate is an estimate: the share of blocks multiplied by the network hashrate.</p>
+				<p class="text-muted pl-foot">Pools are identified by the address that receives the block reward. Addresses without a name are shown as unlabelled; to name one, add it to <code>data/pools.json</code>. <span id="pl-hash-note">Hashrate is an estimate: a pool's share of recent blocks multiplied by the network hashrate.</span></p>
 			</div>
 		</div>
 

@@ -144,6 +144,19 @@
             spanSec = total > 1 ? blocks[total - 1][1] - blocks[0][1] : 0
         }
         var groups = aggregate(entries, total)
+
+        // Hashrate estimate: the pool's share of the recent blocks x the network hashrate. The all-time view uses the whole
+        // recent window, so it still shows what each pool is mining with NOW (an all-time average would be meaningless).
+        var hashBlocks = isAll ? recent : recent.slice(-state.size)
+        var recentCounts = {}
+        hashBlocks.forEach(function(b) { if (b[2]) recentCounts[b[2]] = (recentCounts[b[2]] || 0) + 1 })
+        var hashOf = function(g) {
+            if (!(data.nethash > 0) || g.kind === 'unknown') return null
+            var n = 0
+            Object.keys(g.addrs).forEach(function(a) { n += recentCounts[a] || 0 })
+            return Math.round(data.nethash * n / hashBlocks.length)
+        }
+
         var minerCount = entries.filter(function(e) { return e.addr !== null }).length
 
         // tiles
@@ -188,18 +201,23 @@
         var rows = ''
         groups.forEach(function(g, i) {
             var share = g.count / total * 100
-            var hash = !isAll && data.nethash > 0 && typeof convertHashes === 'function' && g.kind !== 'unknown' ? convertHashes(data.nethash * g.count / total) : '–'
+            var h = typeof convertHashes === 'function' ? hashOf(g) : null
+            var hash = h === null ? '–' : h === 0 ? '<span class="text-muted" title="No blocks in the last ' + fmt(hashBlocks.length) + '">–</span>' : convertHashes(h)
             rows += '<tr>' +
-                '<td class="rank-cell">' + (i + 1) + '</td>' +
+                '<td class="rank-cell pl-hide-sm">' + (i + 1) + '</td>' +
                 '<td>' + labelHtml(g) + '</td>' +
-                '<td class="col-num mono">' + fmt(g.count) + '</td>' +
+                '<td class="col-num mono pl-hide-sm">' + fmt(g.count) + '</td>' +
                 '<td class="col-num mono"><span class="share-pct">' + share.toFixed(1) + '%</span><span class="share-bar"><span style="width:' + Math.min(100, share) + '%"></span></span></td>' +
-                '<td class="col-num mono pl-hide-sm">' + hash + '</td>' +
+                '<td class="col-num mono">' + hash + '</td>' +
                 '<td class="time-cell pl-hide-sm">' + (g.lastHeight ? '<a href="index.html#/height/' + g.lastHeight + '">#' + fmt(g.lastHeight) + '</a> <small>' + esc(timeAgo(g.lastTime)) + '</small>' : '–') + '</td>' +
                 '</tr>'
         })
         document.querySelector('#pl-table tbody').innerHTML = rows
-        $('pl-table-note').textContent = isAll ? 'All time: ' + fmt(total) + ' blocks' : 'Last ' + fmt(total) + ' blocks'
+        var netText = data.nethash > 0 && typeof convertHashes === 'function' ? ' · Network ' + convertHashes(Math.round(data.nethash)) : ''
+        $('pl-table-note').textContent = (isAll ? 'All time: ' + fmt(total) + ' blocks' : 'Last ' + fmt(total) + ' blocks') + netText
+        $('pl-hash-note').textContent = 'Hashrate is an estimate: each pool\'s share of the last ' + fmt(hashBlocks.length) + ' blocks multiplied by the network hashrate' +
+            (isAll ? ' (so it shows current mining power, not an all-time average)' : '') + '. Pools with few blocks give only a rough figure.'
+
 
         // window buttons
         var avail = recent.length

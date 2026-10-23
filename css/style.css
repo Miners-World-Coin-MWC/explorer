@@ -1275,5 +1275,7 @@ body:not(.light) .leaflet-container { background: #0b1018; }
 .pool-link { margin-left: 6px; font-size: 11px; color: var(--text-faint); }
 .pool-link:hover { color: var(--accent); }
 .pl-foot { font-size: 12.5px; margin-bottom: 8px; }
-@media (max-width: 767.98px) { .pl-hide-sm { display: none; } }
+@media (max-width: 767.98px) { .pl-hide-sm { display: none; } #pl-table .share-bar { display: none; } #pl-table th, #pl-table td { padding-left: 12px; padding-right: 12px; } }
 .burn-view-all { text-align: center; font-weight: 600; color: var(--accent-soft); }
+
+#pl-table td.col-num { white-space: nowrap; }
