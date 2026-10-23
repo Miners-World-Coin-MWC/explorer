@@ -1279,3 +1279,17 @@ body:not(.light) .leaflet-container { background: #0b1018; }
 .burn-view-all { text-align: center; font-weight: 600; color: var(--accent-soft); }
 
 #pl-table td.col-num { white-space: nowrap; }
+
+/* ---- Fiat values ---- */
+.currency-select { background: transparent; color: var(--text-muted); border: 1px solid var(--border-strong); border-radius: 8px; padding: 5px 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.currency-select:hover { color: var(--text-main); background: var(--bg-hover); }
+.currency-select option { background: var(--bg-card); color: var(--text-main); }
+.fiat { color: var(--text-faint); font-family: var(--font-mono); font-size: 12px; font-weight: 400; white-space: nowrap; }
+.fiat:empty { display: none; }
+.io-amt { text-align: right; }
+.io-amt .fiat { display: block; }
+.transaction-fiat .fiat { font-size: 12.5px; }
+.kv-val .fiat { margin-left: 4px; }
+.io-fee .io-amt { color: var(--text-main); }
+.io-fee .io-amt { font-size: 13px; font-family: var(--font-mono); }
+.io-fee .io-amt b { font-weight: 500; color: var(--text-faint); }

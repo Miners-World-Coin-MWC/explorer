@@ -105,6 +105,12 @@
 							<div class="dropdown-menu dropdown-menu-right" aria-labelledby="network-versions"></div>
 						</li>
 						<li class="nav-item ml-lg-2">
+							<select id="currencySelect" class="currency-select" aria-label="Show transaction values in" title="Transaction values are shown at today's price">
+								<option value="USD">USD</option><option value="EUR">EUR</option><option value="GBP">GBP</option>
+								<option value="AUD">AUD</option><option value="CAD">CAD</option><option value="BTC">BTC</option>
+							</select>
+						</li>
+						<li class="nav-item ml-lg-2">
 							<button id="themeToggle" type="button" class="btn btn-sm" aria-label="Toggle light/dark theme" title="Toggle theme">
 								<i class="fa-solid fa-circle-half-stroke"></i>
 							</button>
@@ -309,6 +315,7 @@
 		<script src="js/config.js"></script>
 		<script src="js/errorMessages.js"></script>
 		<script src="js/ui.js"></script>
+		<script src="js/fiat.js"></script>
 		<script src="js/charts.js"></script>
 		<script src="js/convertHashes.js"></script>
 		<script src="js/displayDocs.js"></script>

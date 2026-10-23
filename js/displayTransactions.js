@@ -8,6 +8,7 @@ function displayTransactions(holder, data, offset = 0) {
                     <i class="fa-solid fa-right-left text-muted"></i>
                     <a class="tx-hash" href="#/transaction/${tx}">${tx}</a>
                     <span class="transaction-badge"><span class="badge d-none"></span></span>
+                    <span class="transaction-fiat"></span>
                     <span class="transaction-time"></span>
                 </div>
                 <div class="card-body">

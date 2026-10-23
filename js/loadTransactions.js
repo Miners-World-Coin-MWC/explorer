@@ -17,6 +17,7 @@ function loadTransactions(holder) {
             if (data.error == undefined) {
                 tx.find('.tx-unavailable').remove()
                 tx.find('.transaction-time').text(timeFormat(data.result.time)).removeClass('d-none')
+                tx.find('.transaction-fiat').html(fiatHtml(data.result.amount))
 
                 var status = parseTransactionDetails(data.result)
 

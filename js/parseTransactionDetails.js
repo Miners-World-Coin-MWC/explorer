@@ -25,7 +25,7 @@ function parseTransactionDetails(data) {
         return `
             <a class="list-group-item list-group-item-action io-row" href="#/address/${esc(address)}">
                 <span class="io-left"><span class="io-dot ${dot}"></span><span class="io-addr" title="${esc(address)}">${esc(address)}</span>${labelOf(address)}</span>
-                <span class="io-amt">${esc(amountFormat(amount))} <b>${ticker}</b></span>
+                <span class="io-amt">${esc(amountFormat(amount))} <b>${ticker}</b>${fiatHtml(amount)}</span>
             </a>`
     }
 
@@ -68,7 +68,7 @@ function parseTransactionDetails(data) {
         status.to += `
             <li class="list-group-item io-fee">
                 <span>Fee</span>
-                <span class="mono">${esc(amountFormat(status.fee))} <b>${ticker}</b></span>
+                <span class="io-amt mono">${esc(amountFormat(status.fee))} <b>${ticker}</b>${fiatHtml(status.fee)}</span>
             </li>`
     }
 

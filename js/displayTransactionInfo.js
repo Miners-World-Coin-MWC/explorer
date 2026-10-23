@@ -32,8 +32,8 @@ function displayTransactionInfo(data) {
                 ? `<a href="#/block/${esc(data.blockhash)}">#${fmtNum(data.height)}</a>`
                 : `<span class="text-danger">In the memory pool, not yet included in a block</span>`)}
             ${data.time != undefined ? kvRow('Timestamp', `${timeFormat(data.time)} <span class="text-muted">(${esc(data.time)})</span>`) : ''}
-            ${kvRow('Amount transferred', amountHtml(data.amount))}
-            ${isCoinbase ? '' : kvRow('Fee', amountHtml(fee))}
+            ${kvRow('Amount transferred', amountHtml(data.amount) + ' ' + fiatHtml(data.amount))}
+            ${isCoinbase ? '' : kvRow('Fee', amountHtml(fee) + ' ' + fiatHtml(fee))}
             ${kvRow('Size', `${fmtNum(data.size)} bytes`)}
             ${kvRow('Version', esc(data.version))}
             ${data.locktime != 0 ? kvRow('Locktime', esc(data.locktime)) : ''}

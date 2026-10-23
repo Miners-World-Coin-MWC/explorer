@@ -15,7 +15,7 @@ function displayTxVin(vin_list) {
                 <div class="list-group-item" data-tx-vin-index="${index}">
                     <div class="io-row">
                         <span class="io-left"><span class="io-dot in"></span>${addr}${vin['txid'] != undefined ? `<a class="ml-2 text-muted" style="white-space:nowrap" href="#/transaction/${esc(vin['txid'])}" title="Spent output">source tx</a>` : ''}</span>
-                        <span class="io-amt">${vin.value != undefined ? amountHtml(vin.value) : ''}</span>
+                        <span class="io-amt">${vin.value != undefined ? amountHtml(vin.value) + fiatHtml(vin.value) : ''}</span>
                     </div>
                 </div>`)
         }
