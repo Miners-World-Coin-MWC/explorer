@@ -42,6 +42,7 @@ function showCharts(data) {
         'title': { 'text': '' },
         'credits': { 'enabled': false },
         'exporting': { 'enabled': false },
+        'accessibility': { 'description': 'Difficulty, transactions, block size and network hashrate over the last 30 blocks.' },
         'legend': {
             'itemStyle': { 'color': muted, 'fontWeight': '500', 'fontSize': '12px' },
             'itemHoverStyle': { 'color': text }

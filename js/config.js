@@ -7,7 +7,8 @@ var networksConfigs = {
         'decimals': 8,
         'hrp': 'mwc',
         'burnAddress': '9BuRnXTZBMvVVRW5GtP1KxkYd22QKmtNuW',
-        'market': true
+        'market': true,
+        'supplyIncludesBurned': false   // /info supply is already net of burned coins; set true if that ever changes
     },
     'TMWC': {
         'name': 'Test Network (TMWC)',

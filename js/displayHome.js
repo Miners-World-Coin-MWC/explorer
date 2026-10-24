@@ -45,6 +45,7 @@ function displayHome() {
                         }
                     }
 
+                    displayLatestTransactions(blocks['result'])
                     showCharts(chart_data)
                     refreshAges()
                 } else {

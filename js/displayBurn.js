@@ -83,6 +83,7 @@ function displayBurn(supplySatoshis, height) {
     var address = getApi()['burnAddress']
     if (!address) { // networks without a burn address (testnet) simply don't show any of it
         $('.burn-tile, #burn-recent-card').addClass('d-none')
+        $('#stat-burned-fiat').empty()
         burnState.address = null
         setBurned(null)
         return
@@ -101,13 +102,14 @@ function displayBurn(supplySatoshis, height) {
         var burned = Number(data.result.balance)
         $('#stat-burned').removeClass('loading').text(coinsText(burned))
 
-        var supply = Number(supplySatoshis)
+        var supply = totalSupplySat(Number(supplySatoshis), burned) // share of everything ever issued (circulating + burned)
         var share = ''
         if (supply > 0) {
             var pct = burned / supply * 100
             share = (pct > 0 && pct < 0.01 ? '<0.01' : pct.toFixed(2)) + '% of supply'
         }
         $('#stat-burned-sub').text(getApi()['ticker'] + (share ? ' · ' + share : ''))
+        $('#stat-burned-fiat').html(fiatHtml(burned))
         setBurned(burned) // circulating supply = total supply - burned
     }).catch(function() {
         $('#stat-burned').text('Unavailable')

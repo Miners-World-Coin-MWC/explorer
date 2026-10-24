@@ -4,11 +4,21 @@ var supplyState = { supplySat: null, burnedSat: null }
 function setSupply(sat) { supplyState.supplySat = Number(sat); renderSupplyTiles() }
 function setBurned(sat) { supplyState.burnedSat = sat == null ? null : Number(sat); renderSupplyTiles() }
 
+// Does the supply figure from /info already include the burned coins? (configured per network; false for MWC)
+function supplyIncludesBurned() { return getApi()['supplyIncludesBurned'] === true }
+
+// Circulating = coins that can still move. If /info already excludes burned coins this is simply the /info figure.
 function circulatingSat() {
     var supply = supplyState.supplySat
     if (supply == null || !isFinite(supply)) return null
     var burned = supplyState.burnedSat
-    return burned != null && isFinite(burned) ? Math.max(0, supply - burned) : supply
+    return supplyIncludesBurned() && burned != null && isFinite(burned) ? Math.max(0, supply - burned) : supply
+}
+
+// Total ever issued = circulating + burned
+function totalSupplySat(supply, burned) {
+    if (burned == null || !isFinite(burned)) return supply
+    return supplyIncludesBurned() ? supply : supply + burned
 }
 
 function coinsText(sat) {
@@ -24,7 +34,8 @@ function renderSupplyTiles() {
     var burned = supplyState.burnedSat
 
     $('#supply .stat-value').removeClass('loading').find('span').text(fmtNum(Math.floor(parseFloat(amountFormat(circulating)))))
-    $('#supply .stat-sub').text(burned != null ? coinsText(burned) + ' burned · ' + coinsText(supply) + ' total' : ticker + ' · click to refresh')
+    $('#supply .stat-sub').first().text(burned != null ? coinsText(burned) + ' burned · ' + coinsText(totalSupplySat(supply, burned)) + ' total' : ticker + ' · click to refresh')
+    $('#supply-fiat').html(fiatHtml(circulating))
 
     // market tiles only exist on the main network
     var market = getApi()['market'] === true

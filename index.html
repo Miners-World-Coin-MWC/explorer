@@ -11,6 +11,7 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
 		<script src="https://code.highcharts.com/11.4.8/highcharts.js"></script>
+		<script src="https://code.highcharts.com/11.4.8/modules/accessibility.js"></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
 
 		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
@@ -163,6 +164,7 @@
 						<div class="stat-label"><i class="fa-solid fa-coins"></i> Circulating supply</div>
 						<div class="stat-value loading"><span>&ndash;</span></div>
 						<div class="stat-sub">Click to refresh</div>
+						<div class="stat-sub" id="supply-fiat"></div>
 					</div>
 					<div class="stat-tile market-tile d-none">
 						<div class="stat-label"><i class="fa-solid fa-chart-line"></i> Market cap</div>
@@ -178,6 +180,7 @@
 						<div class="stat-label"><i class="fa-solid fa-fire"></i> Total burned</div>
 						<div class="stat-value loading" id="stat-burned">&ndash;</div>
 						<div class="stat-sub" id="stat-burned-sub">&nbsp;</div>
+						<div class="stat-sub" id="stat-burned-fiat"></div>
 					</div>
 					<div class="stat-tile burn-tile d-none">
 						<div class="stat-label"><i class="fa-solid fa-hashtag"></i> Burn transactions</div>
@@ -199,6 +202,19 @@
 					<div class="card-header">Network activity <span class="text-muted" style="font-weight:500">&middot; last 30 blocks</span></div>
 					<div class="card-body">
 						<div class="chart-wrapper" id="network-chart"></div>
+					</div>
+				</div>
+
+				<div class="section-title">
+					<span>Latest transactions</span>
+					<small>Includes block rewards</small>
+				</div>
+				<div class="card mb-3">
+					<div class="latest-tx-head"><span>Block</span><span>Transaction</span><span>Age</span><span class="latest-tx-head-amount">Amount</span></div>
+					<div class="list-group" id="latest-tx-list">
+						<div class="list-group-item"><span class="skeleton" style="width:60%"></span></div>
+						<div class="list-group-item"><span class="skeleton" style="width:55%"></span></div>
+						<div class="list-group-item"><span class="skeleton" style="width:65%"></span></div>
 					</div>
 				</div>
 
@@ -340,6 +356,7 @@
 		<script src="js/displayHistory.js"></script>
 		<script src="js/displaySupply.js"></script>
 		<script src="js/displayBurn.js"></script>
+		<script src="js/displayLatestTx.js"></script>
 		<script src="js/displayHome.js"></script>
 		<script src="js/amountFormat.js"></script>
 		<script src="js/timeFormat.js"></script>

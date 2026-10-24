@@ -14,7 +14,7 @@ function displayBlocks(blocks, prepend = false) {
                         <span data-age="${esc(block.time)}">${timeAgo(block.time)}</span>
                         <small>${timeFormat(block.time)}</small>
                     </td>
-                    <td class="hash-cell"><a href="#/block/${hash}" title="${hash}">${hash}</a></td>
+                    <td class="hash-cell"><a href="#/block/${hash}" title="${hash}">${esc(shortHash(block.hash))}</a></td>
                     <td class="col-num"><span class="pill">${block.txcount != undefined ? esc(block.txcount) : '1'}</span></td>
                 </tr>`
 
