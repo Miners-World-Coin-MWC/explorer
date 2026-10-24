@@ -1,4 +1,5 @@
-// Burned coins section (home page). Coins sent to the network's burn address can never be spent again.
+// Burned coins: stat tiles on the home page + a "latest burns" panel.
+// Coins sent to the network's burn address can never be spent again.
 var burnState = { address: null, height: null, txcount: null }
 
 function burnAmount(tx, address) {
@@ -65,8 +66,8 @@ function renderRecentBurns(address, burns, total) {
     burns.forEach(function(b) {
         html += '<a class="list-group-item list-group-item-action io-row" href="#/transaction/' + esc(b.id) + '">' +
             '<span class="io-left"><i class="fa-solid fa-fire" style="color:var(--accent);margin-right:10px"></i>' +
-            '<span class="io-addr" title="' + esc(timeFormat(b.time)) + '">' + esc(timeAgo(b.time)) + ' <span class="text-muted">&middot; ' + esc(b.id.slice(0, 12)) + '&hellip;</span></span></span>' +
-            '<span class="io-amt">' + esc(amountFormat(b.amount)) + ' <b>' + ticker + '</b></span></a>'
+            '<span class="io-addr" title="' + esc(timeFormat(b.time)) + '">' + esc(timeAgo(b.time)) + ' <span class="text-muted">&middot; ' + esc(shortHash(b.id)) + '</span></span></span>' +
+            '<span class="io-amt">' + esc(amountFormat(b.amount)) + ' <b>' + ticker + '</b>' + fiatHtml(b.amount) + '</span></a>'
     })
     if (!html) html = '<div class="list-group-item text-muted">No burns yet.</div>'
     $('#burn-recent-list').html(html)
@@ -80,39 +81,42 @@ function renderRecentBurns(address, burns, total) {
 
 function displayBurn(supplySatoshis, height) {
     var address = getApi()['burnAddress']
-    if (!address) { // networks without a burn address (testnet) simply don't show the section
-        $('#burn-section').addClass('d-none')
+    if (!address) { // networks without a burn address (testnet) simply don't show any of it
+        $('.burn-tile, #burn-recent-card').addClass('d-none')
+        burnState.address = null
+        setBurned(null)
         return
     }
+    $('.burn-tile').removeClass('d-none')
 
     // Burns only change when a block arrives, so don't ask again until the chain moves
     if (burnState.address === address && burnState.height === height) return
     burnState.address = address
     burnState.height = height
 
-    $('#burn-section').removeClass('d-none')
     $('#burn-address-link').attr('href', '#/address/' + address)
 
     addressBalance(address).then(function(data) {
         if (data.error != undefined || !data.result) return
         var burned = Number(data.result.balance)
-        $('#burn-total').removeClass('loading').text(fmtNum(parseFloat(amountFormat(burned)), 2) + ' ' + getApi()['ticker'])
+        $('#stat-burned').removeClass('loading').text(coinsText(burned))
 
         var supply = Number(supplySatoshis)
-        var share = '–'
+        var share = ''
         if (supply > 0) {
             var pct = burned / supply * 100
-            share = pct > 0 && pct < 0.01 ? '<0.01%' : pct.toFixed(2) + '%'
+            share = (pct > 0 && pct < 0.01 ? '<0.01' : pct.toFixed(2)) + '% of supply'
         }
-        $('#burn-share').removeClass('loading').text(share)
+        $('#stat-burned-sub').text(getApi()['ticker'] + (share ? ' · ' + share : ''))
+        setBurned(burned) // circulating supply = total supply - burned
     }).catch(function() {
-        $('#burn-total').text('Unavailable')
+        $('#stat-burned').text('Unavailable')
         burnState.height = null // try again on the next refresh
     })
 
     addressHistory(address).then(function(data) {
         if (data.error != undefined || !data.result) return
-        $('#burn-count').removeClass('loading').text(fmtNum(data.result.txcount))
+        $('#stat-burncount').removeClass('loading').text(fmtNum(data.result.txcount))
         // reload the list only when there is a new burn transaction
         if (burnState.txcount !== data.result.txcount || $('#burn-recent-list').children().length === 0) {
             burnState.txcount = data.result.txcount
@@ -122,3 +126,11 @@ function displayBurn(supplySatoshis, height) {
         burnState.height = null
     })
 }
+
+// "Show latest burns" under the burn transactions tile
+$(document).on('click', '#burn-toggle', function(e) {
+    e.preventDefault()
+    var card = $('#burn-recent-card')
+    card.toggleClass('d-none')
+    $(this).text(card.hasClass('d-none') ? 'Show latest burns' : 'Hide latest burns')
+})

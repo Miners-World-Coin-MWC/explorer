@@ -6,7 +6,7 @@ function displayTransactions(holder, data, offset = 0) {
             <div class="card tx-card mt-3" data-transaction="${tx}" data-transaction-index="${index}" data-transaction-loaded="false">
                 <div class="card-header">
                     <i class="fa-solid fa-right-left text-muted"></i>
-                    <a class="tx-hash" href="#/transaction/${tx}">${tx}</a>
+                    <a class="tx-hash" href="#/transaction/${tx}" title="${tx}">${esc(shortHash(transaction))}</a>
                     <span class="transaction-badge"><span class="badge d-none"></span></span>
                     <span class="transaction-fiat"></span>
                     <span class="transaction-time"></span>

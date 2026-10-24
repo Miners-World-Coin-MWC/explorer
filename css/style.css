@@ -1293,3 +1293,36 @@ body:not(.light) .leaflet-container { background: #0b1018; }
 .io-fee .io-amt { color: var(--text-main); }
 .io-fee .io-amt { font-size: 13px; font-family: var(--font-mono); }
 .io-fee .io-amt b { font-weight: 500; color: var(--text-faint); }
+
+/* ---- Stat tiles: market + burn row ---- */
+.stat-sub a { font-weight: 600; }
+.stat-sub { overflow-wrap: anywhere; }
+#burn-recent-card .list-group-item:last-child { border-bottom: 0; }
+
+/* ---- Transaction cards: short id + fiat value in the header, wrapping nicely on small screens ---- */
+.tx-card .card-header { gap: 6px 10px; }
+.tx-card .tx-hash { font-family: var(--font-mono); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: visible; }
+.tx-card .transaction-fiat:empty { display: none; }
+.tx-card .transaction-badge .badge.d-none { display: none; }
+@media (max-width: 575.98px) {
+  .tx-card .card-header { padding: 12px 14px; }
+  .tx-card .transaction-time { margin-left: 0; flex-basis: 100%; font-size: 12px; }
+  .stat-sub { font-size: 11.5px; }
+}
+
+/* ---- Transaction cards / lists on small screens: nothing may be wider than its card ---- */
+.tx-card .tx-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.tx-card .tx-col { min-width: 0; }
+.tx-card .list-group-item, #tx-vin-list .list-group-item, #tx-vout-list .list-group-item { min-width: 0; }
+@media (max-width: 767.98px) { .tx-card .tx-cols { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 575.98px) {
+  /* address (and its label) on the left, amount + fiat on the right, wrapping instead of pushing the amount off screen */
+  .tx-card .io-row, #tx-vin-list .io-row, #tx-vout-list .io-row {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: start;
+  }
+  .tx-card .io-left, #tx-vin-list .io-left, #tx-vout-list .io-left { flex-wrap: wrap; row-gap: 4px; min-width: 0; }
+  .tx-card .io-left .io-addr, #tx-vin-list .io-left .io-addr, #tx-vout-list .io-left .io-addr { flex: 1 1 calc(100% - 18px); min-width: 0; }
+  .tx-card .io-left .addr-label { margin: 0 0 0 18px !important; white-space: normal; }
+  .tx-card .list-group-item, #tx-vin-list .list-group-item, #tx-vout-list .list-group-item { padding-left: 14px; padding-right: 14px; }
+  .tx-card .io-fee, #tx-vin-list .io-fee, #tx-vout-list .io-fee { display: flex; }
+}

@@ -3,9 +3,8 @@ function displayHome() {
         var height = data.result.blocks
         var display_height = Number($('#blocks-table tbody tr[data-height]').first().attr('data-height'))
 
-        var supply = parseInt(amountFormat(data.result.supply))
-        $('#supply .stat-value').removeClass('loading').find('span').text(fmtNum(supply))
-        $('#supply .stat-sub').text(getApi()['ticker'] + ' · click to refresh')
+        if (typeof fiatNetworkChanged === 'function') fiatNetworkChanged()
+        setSupply(data.result.supply)
         $('#stat-height').removeClass('loading').text(fmtNum(height))
         displayBurn(data.result.supply, height)
 

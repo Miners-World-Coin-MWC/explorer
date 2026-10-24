@@ -50,7 +50,16 @@ function fiatFormat(value, currency, base) {
     }).format(value)
 }
 
-function fiatReady() { return fiat.price !== null && fiat.priceCurrency === fiat.currency }
+function fiatEnabled() { return getApi()['market'] === true }   // prices only mean something on the main network
+function fiatReady() { return fiatEnabled() && fiat.price !== null && fiat.priceCurrency === fiat.currency }
+
+// Big numbers compactly ($1.23M); small ones in full
+function fiatCompact(value, currency) {
+    if (currency !== 'BTC' && value >= 1e6) {
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency, notation: 'compact', maximumFractionDigits: 2 }).format(value)
+    }
+    return fiatFormat(value, currency)
+}
 
 function fiatText(satoshis) {
     var sat = Number(satoshis)
@@ -73,9 +82,21 @@ function refreshFiat() {
     $('.fiat[data-sat]').each(function() {
         $(this).text(fiatText($(this).attr('data-sat'))).attr('title', title)
     })
+    if (typeof renderSupplyTiles === 'function') renderSupplyTiles()
+}
+
+// Called whenever the network may have changed (including at start): shows/hides the selector and refetches the price
+var fiatWasEnabled = null
+function fiatNetworkChanged() {
+    var enabled = fiatEnabled()
+    $('#currencySelect').closest('li').toggleClass('d-none', !enabled)
+    if (enabled === fiatWasEnabled) return
+    fiatWasEnabled = enabled
+    if (enabled) { updateFiatPrice() } else { fiat.price = null; fiat.priceCurrency = null; refreshFiat() }
 }
 
 function updateFiatPrice() {
+    if (!fiatEnabled()) return Promise.resolve()
     var id = ++fiat.requestId
     var currency = fiat.currency
     return fiatFromCoinPaprika(currency).then(function(price) {
@@ -103,6 +124,6 @@ $(document).ready(function() {
         refreshFiat() // clears values until the price for the new currency arrives (never shows a value in the wrong currency)
         updateFiatPrice()
     })
-    updateFiatPrice()
+    fiatNetworkChanged()
     window.setInterval(updateFiatPrice, 120000)
 })

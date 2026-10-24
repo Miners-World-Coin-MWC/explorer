@@ -1,5 +1,11 @@
 // Shared UI helpers (escaping, number formatting, copy buttons)
 
+// 64-character ids are shortened to first6…last6 (the full value stays in the link and tooltip)
+function shortHash(h) {
+    h = String(h == null ? '' : h)
+    return h.length > 14 ? h.slice(0, 6) + '…' + h.slice(-6) : h
+}
+
 // Escape untrusted text before putting it into HTML
 function esc(value) {
     return String(value == null ? '' : value)

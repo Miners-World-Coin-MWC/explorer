@@ -6,7 +6,8 @@ var networksConfigs = {
         'ticker': 'MWC',
         'decimals': 8,
         'hrp': 'mwc',
-        'burnAddress': '9BuRnXTZBMvVVRW5GtP1KxkYd22QKmtNuW'
+        'burnAddress': '9BuRnXTZBMvVVRW5GtP1KxkYd22QKmtNuW',
+        'market': true
     },
     'TMWC': {
         'name': 'Test Network (TMWC)',
