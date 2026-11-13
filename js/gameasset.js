@@ -557,8 +557,8 @@ var GA = (function () {
     function fetchRegistryData(txid) {
         var c = registryCache[txid]
         if (c) return c.promise
-        var entry = { state: 'error', res: null, promise: null }
         var url = registryEndpoint(txid)
+        var entry = { state: 'pending', res: null, promise: null }
         var live = (url && !liveDown)
             ? fetchJsonWithTimeout(url, 6000)
                 .then(function (j) {
@@ -646,13 +646,24 @@ var GA = (function () {
         return true   // a re-render is scheduled; caller shouldn't schedule another
     }
 
+    /** Synchronous best-effort enrichment for a freshly decoded event object
+     *  (the tx page decodes its OWN objects on every render — without this,
+     *  a re-render would discard the fetched registry data and fall back to
+     *  the hash-only card). No-op when nothing is cached for the tx yet. */
+    function applyCachedRegistryData(txid, ga) {
+        var c = registryCache[txid]
+        if (c && c.state === 'done' && c.res) return applyRegistryData(ga, c.res)
+        return false
+    }
+
     return {
         MAGIC: MAGIC, BURN_ADDRESS: BURN_ADDRESS, EVENT_NAMES: EVENT_NAMES, NO_SUCCESSOR: NO_SUCCESSOR,
         sha256Bytes: sha256Bytes, protoHash: protoHash, deriveBodyHash: deriveBodyHash, deriveAssetId: deriveAssetId,
         hexToBytes: hexToBytes, bytesToHex: bytesToHex, extractOpReturnData: extractOpReturnData,
         decodeEnvelope: decodeEnvelope, decodeGameAssetOutput: decodeGameAssetOutput, collectGameAssets: collectGameAssets,
         gameAssetVoutHtml: gameAssetVoutHtml, gameAssetBannerHtml: gameAssetBannerHtml,
-        fetchRegistryData: fetchRegistryData, applyRegistryData: applyRegistryData, enhanceGameAssets: enhanceGameAssets,
+        fetchRegistryData: fetchRegistryData, applyRegistryData: applyRegistryData, applyCachedRegistryData: applyCachedRegistryData,
+        enhanceGameAssets: enhanceGameAssets,
         registryCache: registryCache
     }
 })()
@@ -664,6 +675,7 @@ if (typeof window !== 'undefined') {
     window.gameAssetVoutHtml = GA.gameAssetVoutHtml
     window.gameAssetBannerHtml = GA.gameAssetBannerHtml
     window.enhanceGameAssets = GA.enhanceGameAssets
+    window.applyCachedRegistryData = GA.applyCachedRegistryData
     window.GA_PROTOCOL = GA
 }
 // Node (unit tests)

@@ -15,7 +15,7 @@ OP_RETURN payload (`MWC-GAME-ASSET` protocol). Transaction pages decode these pa
   `js/gameasset.js` first tries `GET {GAME_API_BASE}/api/assets/tx/{txid}` (public, CORS `*`), and
   when the live registry is unreachable from browsers — e.g. the game server has no TLS yet, so an
   HTTPS page can't fetch plain HTTP (mixed content) — it falls back to **`data/game-assets.json`**,
-  a snapshot published by `tools/build-game-assets.js`. Both paths return the canonical body incl.
+  a snapshot published by `tools/build-game-assets.mjs`. Both paths return the canonical body incl.
   `bodyHex`, and the page **re-derives the SHA-256 commitment itself** and badges the asset
   "✔ commitment verified" (or "⚠ mismatch"). Nothing is displayed as verified that isn't re-checked
   against this transaction's own OP_RETURN hash — a stale or forged snapshot can never fake an asset.
@@ -24,9 +24,9 @@ OP_RETURN payload (`MWC-GAME-ASSET` protocol). Transaction pages decode these pa
 Keeping the snapshot fresh (no TLS needed — the builder talks plain HTTP server-side):
 
 ```bash
-node tools/build-game-assets.js                    # incremental scan + refresh (state: data/.game-assets-state.json)
-node tools/build-game-assets.js --start 222000     # first full backfill from a height
-node tools/build-game-assets.js --txid <hex>       # force-include/refresh one transaction
+node tools/build-game-assets.mjs                    # incremental scan + refresh (state: data/.game-assets-state.json)
+node tools/build-game-assets.mjs --start 222000     # first full backfill from a height
+node tools/build-game-assets.mjs --txid <hex>       # force-include/refresh one transaction
 ```
 
 `.github/workflows/game-assets.yml` runs it every 30 minutes and publishes the snapshot + state to

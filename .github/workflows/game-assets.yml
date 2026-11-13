@@ -35,7 +35,7 @@ jobs:
       - name: Build snapshot
         # Incremental: scans only new blocks, refreshes every known tx against
         # the game registry. Bounded per run; the next run continues.
-        run: node tools/build-game-assets.js --concurrency 6 --delay 40 --max-blocks 1200
+        run: node tools/build-game-assets.mjs --concurrency 6 --delay 40 --max-blocks 1200
 
       - name: Publish
         env:

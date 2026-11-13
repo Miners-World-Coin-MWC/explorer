@@ -8,6 +8,10 @@ function displayTxVout(vout_list, fee = 0, txid = '') {
                 // as decoded NFT cards; everything else stays raw data.
                 var ga = (typeof decodeGameAssetOutput === 'function') ? decodeGameAssetOutput(spk) : null
                 if (ga) {
+                    // This is a FRESH decode — on re-renders, pull in the
+                    // already-fetched registry data (name/rarity/verified
+                    // commitment) so the card doesn't fall back to hash-only.
+                    if (typeof applyCachedRegistryData === 'function') applyCachedRegistryData(txid, ga)
                     $('#tx-vout-list').append(gameAssetVoutHtml(ga, { index: index, txid: txid }))
                 } else {
                     $('#tx-vout-list').append(`

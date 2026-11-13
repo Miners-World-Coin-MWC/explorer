@@ -213,6 +213,51 @@ console.log('gameasset.js unit tests\n')
     delete globalThis.location
 }
 
+// 10. Page-flow regression (the tx-page render sequence, exactly):
+//     render #1 decodes fresh objects (hash-only) → enhanceGameAssets
+//     schedules the fetch → onReady re-renders, decoding FRESH objects again.
+//     The cached registry data must reach those fresh objects — both the
+//     banner path (enhanceGameAssets sync-apply) and the vout-card path
+//     (applyCachedRegistryData on a per-output decode). Before this test,
+//     the re-render discarded the enrichment and showed the hash-only card.
+{
+    const bodyJson = '{"assetIdSlot":"' + '11'.repeat(32) + '","seq":0,"controlVout":0,"prevEventTxid":"' + '00'.repeat(32) + '","ownerCommitment":"' + 'ab'.repeat(20) + '","timestamp":1794533464904,"gameEventRef":"badge:bug_hunter:1157581316175437884","meta":{"t":"MINT","itemId":"badge_bug_hunter","name":"Bug Hunter","category":"badge","rarity":"uncommon"}}'
+    const api = { ok: true, asset: { assetId: LIVE_ASSET_ID, name: 'Bug Hunter', status: 'MINTED', rarity: 'uncommon', category: 'badge', nonTransferable: true }, payload: { bodyHash: LIVE_BODY_HASH, bodyJson, bodyHex: null, payloadHex: LIVE_SPK_HEX.slice(2) } }
+    const fakeFetch = (url) => String(url).includes('/api/assets/tx/')
+        ? Promise.resolve({ ok: true, json: async () => api })
+        : Promise.resolve({ ok: false, json: async () => null })
+    const GAp = importDefault(fakeFetch, 'https://game.minersworld.org')
+
+    // render #1 — fresh decode, enhancement scheduled, hash-only so far
+    const gas1 = [GAp.decodeGameAssetOutput({ hex: LIVE_SPK_HEX })]
+    let rerendered = false
+    const scheduled = GAp.enhanceGameAssets(LIVE_TXID, gas1, () => { rerendered = true })
+    ok('page render #1 schedules the fetch', scheduled === true)
+    ok('render #1 stays hash-only', !gas1[0].registry && !gas1[0].body)
+    await GAp.fetchRegistryData(LIVE_TXID)
+    await new Promise((r) => setTimeout(r, 0))   // let the enhance .then run (applies + onReady)
+    ok('fetch landed → page was asked to re-render', rerendered === true)
+
+    // render #2 — the page decodes FRESH objects; cache must apply synchronously
+    const gas2 = [GAp.decodeGameAssetOutput({ hex: LIVE_SPK_HEX })]
+    const scheduledAgain = GAp.enhanceGameAssets(LIVE_TXID, gas2, () => { throw new Error('loop!') })
+    ok('re-render schedules nothing new (no loop)', scheduledAgain === false)
+    ok('re-render banner object enriched (registry + body)', gas2[0].registry && gas2[0].registry.name === 'Bug Hunter' && gas2[0].body && gas2[0].body.meta.name === 'Bug Hunter')
+
+    // vout-card path — displayTxVout decodes its own fresh object per output
+    const gaV = GAp.decodeGameAssetOutput({ hex: LIVE_SPK_HEX })
+    ok('vout decode enriched via applyCachedRegistryData', GAp.applyCachedRegistryData(LIVE_TXID, gaV) === true && !!gaV.registry)
+
+    const banner = GAp.gameAssetBannerHtml(gas2)
+    const card = GAp.gameAssetVoutHtml(gaV, { index: 1, txid: LIVE_TXID })
+    ok('banner names the asset on re-render', banner.includes('Bug Hunter'))
+    ok('vout card shows name + soul-bound on re-render', card.includes('Bug Hunter') && card.includes('soul-bound'))
+
+    // unknown txid → helper is a clean no-op
+    const gaX = GAp.decodeGameAssetOutput({ hex: LIVE_SPK_HEX })
+    ok('applyCachedRegistryData no-ops without cache', GAp.applyCachedRegistryData('ff'.repeat(32), gaX) === false && !gaX.registry)
+}
+
 console.log(`\nRESULT: ${fail === 0 ? 'PASS' : 'FAIL'} — pass ${pass} / fail ${fail}`)
 process.exit(fail === 0 ? 0 : 1)
 

@@ -18,6 +18,23 @@ function displayTransactionInfo(data, isRerender) {
     // carries an MWC Game Asset OP_RETURN payload, show a decoded NFT banner.
     var gameAssets = (typeof collectGameAssets === 'function') ? collectGameAssets(data) : []
 
+    // COMMITMENT-mode payloads carry only a hash on chain. Ask the game
+    // registry for the full body + metadata. Runs on EVERY render: the first
+    // one schedules the fetch (hash-only view until it lands), while re-
+    // renders apply the cached result to the freshly decoded objects BEFORE
+    // the HTML below is built — a re-render that skipped this would decode
+    // brand-new objects and throw the enrichment away (hash-only card
+    // forever). Safe against loops: one fetch per txid; once cached, the
+    // call applies synchronously and schedules nothing.
+    if (gameAssets.length && typeof enhanceGameAssets === 'function') {
+        enhanceGameAssets(data.txid, gameAssets, function() {
+            // Only re-render if this tx is still on screen — fast navigation
+            // could have swapped the view to another transaction.
+            var shown = $('#tx-info-hash').data('tx-info-hash')
+            if (!shown || shown === data.txid) displayTransactionInfo(data, true)
+        })
+    }
+
     var status = confirmed
         ? `<span class="badge badge-ok">${fmtNum(data.confirmations)} confirmations</span>`
         : `<span class="badge badge-pending">Unconfirmed</span>`
@@ -56,12 +73,4 @@ function displayTransactionInfo(data, isRerender) {
 
     $('#tx-info-vout-total').removeClass('d-none')
     $('#tx-info-vin-total').removeClass('d-none')
-
-    // COMMITMENT-mode payloads carry only a hash on chain. Ask the game
-    // registry for the full body + metadata; when it arrives (once per tx),
-    // re-render with names/rarities AND the re-verified commitment. The
-    // hash-only view above stays up if the registry is unreachable.
-    if (!isRerender && gameAssets.length && typeof enhanceGameAssets === 'function') {
-        enhanceGameAssets(data.txid, gameAssets, function() { displayTransactionInfo(data, true) })
-    }
 }
