@@ -448,7 +448,10 @@ var GA = (function () {
         // Registry-sourced facts render for every protocol event, with or
         // without an inline/resolved body — clearly marked as off-chain data.
         if (!ga.legacy && ga.registry) {
-            var regNote = '<span class="ga-src">' + gaEsc(ga.registry.status) + (ga.registry.nonTransferable ? ' · soul-bound' : '') + ' · <a href="' + gaEsc(registryAssetHref(ga)) + '" target="_blank" rel="noopener">asset page</a></span>'
+            var srcLabel = ga.registrySource === 'snapshot'
+                ? 'registry snapshot' + (ga.registrySnapshotAt ? ' · ' + gaEsc(ga.registrySnapshotAt) : '')
+                : 'game registry (live)'
+            var regNote = '<span class="ga-src">' + gaEsc(ga.registry.status) + (ga.registry.nonTransferable ? ' · soul-bound' : '') + ' · ' + srcLabel + ' · <a href="' + gaEsc(registryAssetHref(ga)) + '" target="_blank" rel="noopener">asset page</a></span>'
             body += gaKv('Game registry', regNote)
         }
 
@@ -484,27 +487,90 @@ var GA = (function () {
     // including bodyHex so the client can RE-DERIVE the commitment itself and
     // never take the registry's word for anything.
     var registryCache = {}   // txid -> { state: 'pending'|'done'|'error', res: object|null }
+    var liveDown = false      // live GAME_API_BASE unreachable this page load (e.g. no TLS yet)
+    var snapshotState = { promise: null, data: null }   // same-origin registry snapshot
 
     function registryEndpoint(txid) {
         var base = (typeof GAME_API_BASE === 'string' ? GAME_API_BASE : '').replace(/\/+$/, '')
         return base ? base + '/api/assets/tx/' + encodeURIComponent(txid) : null
     }
 
-    /** Fetch (cached, never throws, 6s timeout). Promise<object|null>. */
+    // Same-origin snapshot published by tools/build-game-assets.js (GitHub
+    // Action). Works even when the live game API is unreachable from browsers
+    // (plain HTTP behind no TLS = mixed content). Same trust model: the
+    // snapshot carries bodyHex and the browser re-derives the commitment, so a
+    // stale or forged snapshot can never fake an asset.
+    function snapshotUrls() {
+        var urls = ['data/game-assets.json']
+        // On *.github.io derive the data-branch URL the same way richlist.js does
+        try {
+            if (typeof location === 'object' && location && /\.github\.io$/.test(location.hostname || '')) {
+                var repo = (location.pathname || '').split('/').filter(Boolean)[0]
+                if (repo) {
+                    var org = location.hostname.slice(0, -'.github.io'.length)
+                    urls.push('https://raw.githubusercontent.com/' + org + '/' + repo + '/game-assets-data/game-assets.json')
+                }
+            }
+        } catch (e) { /* no location — same-origin only */ }
+        return urls
+    }
+
+    function fetchJsonWithTimeout(url, ms) {
+        return fetch(url, {
+            signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(ms) : undefined,
+        }).then(function (r) { return r && r.ok ? r.json() : null })
+    }
+
+    function loadSnapshot() {
+        if (!snapshotState.promise) {
+            var urls = snapshotUrls()
+            var tryAt = function (i) {
+                if (i >= urls.length) { snapshotState.data = null; return Promise.resolve(null) }
+                return fetchJsonWithTimeout(urls[i] + '?ts=' + Date.now(), 5000)
+                    .then(function (j) {
+                        if (j && j.entries) { snapshotState.data = j; return j }
+                        return tryAt(i + 1)
+                    })
+                    .catch(function () { return tryAt(i + 1) })
+            }
+            snapshotState.promise = tryAt(0)
+        }
+        return snapshotState.promise
+    }
+
+    function snapshotLookup(txid) {
+        return loadSnapshot().then(function (snap) {
+            var e = snap && snap.entries[txid]
+            if (!e) return null
+            var reg = e.registry || {}
+            if (!reg.asset && !reg.payload) return null
+            return {
+                ok: true, source: 'snapshot', txid: txid,
+                asset: reg.asset || null, payload: reg.payload || null,
+                snapshotGeneratedAt: snap.generatedAt || null,
+            }
+        })
+    }
+
+    /** Fetch (cached, never throws, 6s timeout). Tries the live registry
+     *  first, then the same-origin snapshot. Promise<object|null>. */
     function fetchRegistryData(txid) {
         var c = registryCache[txid]
         if (c) return c.promise
-        var url = registryEndpoint(txid)
         var entry = { state: 'error', res: null, promise: null }
-        entry.promise = !url
-            ? Promise.resolve(null)
-            : fetch(url, { signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined })
-                .then(function (r) { return r.ok ? r.json() : null })
+        var url = registryEndpoint(txid)
+        var live = (url && !liveDown)
+            ? fetchJsonWithTimeout(url, 6000)
                 .then(function (j) {
-                    if (j && j.ok) { entry.state = 'done'; entry.res = j; return j }
-                    entry.state = 'error'; return null
+                    if (j && j.ok && (j.payload || j.asset)) return j
+                    if (j === null) liveDown = true // network/HTTP failure — skip live for this page load
+                    return null
                 })
-                .catch(function () { entry.state = 'error'; return null })
+                .catch(function () { liveDown = true; return null })
+            : Promise.resolve(null)
+        entry.promise = live
+            .then(function (res) { return res ? res : snapshotLookup(txid) })
+            .then(function (res) { entry.state = res ? 'done' : 'error'; entry.res = res; return res })
         registryCache[txid] = entry
         return entry.promise
     }
@@ -542,6 +608,8 @@ var GA = (function () {
                 rarity: res.asset.rarity, category: res.asset.category, owner: res.asset.owner,
                 nonTransferable: !!res.asset.nonTransferable,
             }
+            ga.registrySource = res.source === 'snapshot' ? 'snapshot' : 'live'
+            ga.registrySnapshotAt = res.snapshotGeneratedAt || null
             changed = true
         }
         return changed

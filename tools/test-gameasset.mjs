@@ -14,12 +14,15 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const GA = importDefault()
-function importDefault() {
+function importDefault(fetchImpl, gameApiBase) {
     const self = dirname(fileURLToPath(import.meta.url))
     const src = readFileSync(join(self, '..', 'js', 'gameasset.js'), 'utf8')
     const mod = { exports: {} }
-    // gameasset.js checks for browser globals; evaluate as CommonJS-ish module
-    new Function('module', 'exports', 'window', 'fetch', 'AbortSignal', src)(mod, mod.exports, undefined, undefined, undefined)
+    // gameasset.js checks for browser globals; evaluate as CommonJS-ish module.
+    // GAME_API_BASE is picked up as a global when explicitly provided.
+    const preamble = gameApiBase ? `var GAME_API_BASE = ${JSON.stringify(gameApiBase)};\n` : ''
+    const fn = new Function('module', 'exports', 'window', 'fetch', 'AbortSignal', preamble + src)
+    fn(mod, mod.exports, undefined, fetchImpl, undefined)
     return mod.exports
 }
 
@@ -153,6 +156,61 @@ console.log('gameasset.js unit tests\n')
     const banner = GA.gameAssetBannerHtml([ga])
     ok('banner escapes registry name', banner.includes('&lt;script&gt;'))
     ok('banner uses registry name', banner.includes('&lt;script&gt;x&lt;/script&gt;'))
+}
+
+// 8. Snapshot fallback — live registry unreachable (no TLS / mixed content)
+//    → same-origin data/game-assets.json serves the record.
+{
+    const LIVE_HASH = LIVE_BODY_HASH
+    const snapshot = {
+        generatedAt: '2026-11-13T18:51:36.776Z',
+        entries: {
+            [LIVE_TXID]: {
+                registry: {
+                    asset: { assetId: LIVE_ASSET_ID, name: 'Bug Hunter', status: 'MINTED', rarity: 'uncommon', category: 'badge', owner: '1157581316175437884', nonTransferable: true },
+                    payload: { bodyHash: LIVE_HASH, bodyHex: '00'.repeat(64), payloadHex: '' }, // wrong bodyHex on purpose
+                },
+            },
+        },
+    }
+    const fakeFetch = (url) => {
+        if (String(url).includes('/api/assets/tx/')) {
+            return Promise.reject(new Error('TLS to 51.15.16.47:8081 failed — exactly the production symptom'))
+        }
+        if (String(url).includes('game-assets.json')) {
+            return Promise.resolve({ ok: true, json: async () => snapshot })
+        }
+        return Promise.resolve({ ok: false, json: async () => null })
+    }
+    const GA2 = importDefault(fakeFetch, 'https://51.15.16.47:8081')
+    const res = await GA2.fetchRegistryData(LIVE_TXID)
+    ok('live failure falls back to snapshot', !!res && res.source === 'snapshot')
+    ok('snapshot entry carries asset + payload', res.asset && res.asset.name === 'Bug Hunter' && !!res.payload)
+    const ga = GA2.decodeGameAssetOutput({ hex: LIVE_SPK_HEX })
+    GA2.applyRegistryData(ga, res)
+    ok('snapshot registry facts applied + sourced', ga.registry && ga.registry.name === 'Bug Hunter' && ga.registrySource === 'snapshot')
+    ok('snapshot bodyHex mismatch flagged (no false "verified" badge)', ga.registryVerified === false && !ga.body)
+    ok('unknown txid yields null', (await GA2.fetchRegistryData('ab'.repeat(32))) === null)
+    const html = GA2.gameAssetVoutHtml(ga, { index: 1, txid: LIVE_TXID })
+    ok('vout html labels the snapshot source', html.includes('registry snapshot'))
+}
+
+// 9. Snapshot via the game-assets-data branch when same-origin 404s
+//    (Pages deployments that don't include data/ in the deployed tree).
+{
+    globalThis.location = { hostname: 'miners-world-coin-mwc.github.io', pathname: '/explorer/index.html' }
+    const snapshot = { generatedAt: '2026-11-13T00:00:00Z', entries: { [LIVE_TXID]: { registry: { asset: { assetId: LIVE_ASSET_ID, name: 'Bug Hunter', status: 'MINTED' } } } } }
+    const fakeFetch = (url) => {
+        const u = String(url)
+        if (u.includes('/api/assets/tx/')) return Promise.reject(new Error('live down'))
+        if (u.startsWith('data/game-assets.json')) return Promise.resolve({ ok: false, json: async () => null })   // same-origin miss
+        if (u.includes('/game-assets-data/game-assets.json')) return Promise.resolve({ ok: true, json: async () => snapshot }) // branch hit
+        return Promise.resolve({ ok: false, json: async () => null })
+    }
+    const GA3 = importDefault(fakeFetch, 'https://51.15.16.47:8081')
+    const res = await GA3.fetchRegistryData(LIVE_TXID)
+    ok('falls back to the game-assets-data branch URL', !!res && res.source === 'snapshot' && res.asset && res.asset.name === 'Bug Hunter')
+    delete globalThis.location
 }
 
 console.log(`\nRESULT: ${fail === 0 ? 'PASS' : 'FAIL'} — pass ${pass} / fail ${fail}`)

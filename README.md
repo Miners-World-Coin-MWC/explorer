@@ -12,21 +12,36 @@ OP_RETURN payload (`MWC-GAME-ASSET` protocol). Transaction pages decode these pa
   metadata attributes, control UTXO, previous-event links, hash-integrity badge).
 - **INLINE payloads** are fully decoded + SHA-256 verified straight off the chain.
 - **COMMITMENT payloads** (only a hash fits on chain) are resolved against the game registry:
-  `js/gameasset.js` fetches `GET {GAME_API_BASE}/api/assets/tx/{txid}` (public, CORS `*`), which
-  returns the canonical body incl. `bodyHex` — the page then **re-derives the SHA-256 commitment
-  itself** and badges the asset "✔ commitment verified" (or "⚠ mismatch"). Nothing is displayed as
-  verified that isn't re-checked against this transaction's own OP_RETURN hash.
+  `js/gameasset.js` first tries `GET {GAME_API_BASE}/api/assets/tx/{txid}` (public, CORS `*`), and
+  when the live registry is unreachable from browsers — e.g. the game server has no TLS yet, so an
+  HTTPS page can't fetch plain HTTP (mixed content) — it falls back to **`data/game-assets.json`**,
+  a snapshot published by `tools/build-game-assets.js`. Both paths return the canonical body incl.
+  `bodyHex`, and the page **re-derives the SHA-256 commitment itself** and badges the asset
+  "✔ commitment verified" (or "⚠ mismatch"). Nothing is displayed as verified that isn't re-checked
+  against this transaction's own OP_RETURN hash — a stale or forged snapshot can never fake an asset.
 - **Legacy v1 JSON anchors** (`{"v":1,"a":"MWC1-…"}`) still decode.
 
-Set `GAME_API_BASE` in `js/config.js` to the game server's **HTTPS** origin. The explorer is served
-over HTTPS, so browsers silently block fetches to plain-`http://` origins (mixed content): until the
-game API has TLS in front of it, COMMITMENT payloads fall back to the hash-only view (with registry
-names whenever `/api/assets/tx/…` is reachable) — no error, no false data.
+Keeping the snapshot fresh (no TLS needed — the builder talks plain HTTP server-side):
+
+```bash
+node tools/build-game-assets.js                    # incremental scan + refresh (state: data/.game-assets-state.json)
+node tools/build-game-assets.js --start 222000     # first full backfill from a height
+node tools/build-game-assets.js --txid <hex>       # force-include/refresh one transaction
+```
+
+`.github/workflows/game-assets.yml` runs it every 30 minutes and publishes the snapshot + state to
+the single-commit `game-assets-data` branch (same policy as the richlist). The page loads the
+snapshot same-origin first, then the branch's raw URL. Once the game server gets TLS and
+`GAME_API_BASE` points at it, live lookups take over automatically and the snapshot becomes the
+fallback.
+
+`GAME_API_BASE` in `js/config.js` must be an **HTTPS** origin (or left pointing where TLS will
+terminate) — browsers silently block `http://` subresources on an HTTPS page.
 
 Tests (no dependencies, Node 18+):
 
 ```bash
-node tools/test-gameasset.mjs           # unit tests incl. live chain fixtures
+node tools/test-gameasset.mjs           # unit tests incl. live chain fixtures + snapshot fallback
 node tools/integration-gameasset.mjs    # live chain + live registry end-to-end
 ```
 

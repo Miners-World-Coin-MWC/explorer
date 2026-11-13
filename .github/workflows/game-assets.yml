@@ -1,0 +1,51 @@
+name: Update game-asset snapshot
+
+# Keeps data/game-assets.json (NFT metadata for commitment-mode game assets)
+# in sync with the chain + game registry. The explorer reads it same-origin /
+# from this branch, so NFT metadata shows even before the game server has TLS.
+on:
+  schedule:
+    # Every 30 minutes, off the busy top-of-hour slots (same idea as richlist)
+    - cron: '13,43 * * * *'
+  workflow_dispatch:           # "Run workflow" button in the Actions tab
+
+permissions:
+  contents: write              # needed to push the game-assets-data branch
+
+concurrency:
+  group: game-assets
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Restore saved state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash tools/restore-game-assets.sh
+
+      - name: Build snapshot
+        # Incremental: scans only new blocks, refreshes every known tx against
+        # the game registry. Bounded per run; the next run continues.
+        run: node tools/build-game-assets.js --concurrency 6 --delay 40 --max-blocks 1200
+
+      - name: Publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash tools/publish-game-assets.sh
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo '## Game-asset snapshot'
+            node -e "const j=require('./data/game-assets.json');console.log('entries: '+Object.keys(j.entries).length+' · scannedThrough: '+j.scannedThrough+' · generated: '+j.generatedAt)" 2>/dev/null || echo 'no snapshot produced'
+          } >> "$GITHUB_STEP_SUMMARY"
