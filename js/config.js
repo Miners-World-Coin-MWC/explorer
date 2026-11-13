@@ -25,4 +25,4 @@ var networksConfigs = {
 // commitment against the on-chain envelope hash.
 // NOTE: must be an HTTPS origin (or same-origin) — this page is served over
 // HTTPS and browsers block mixed-content subresource fetches to plain HTTP.
-var GAME_API_BASE = 'https://51.15.16.47:8081'   // TODO: point at the game's HTTPS domain once TLS terminates in front of it (an http:// URL is silently blocked on the HTTPS explorer — see README)
+var GAME_API_BASE = 'https://game.minersworld.org'   // live game registry (TLS) — full NFT metadata + commitment verification on tx pages
