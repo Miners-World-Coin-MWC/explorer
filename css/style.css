@@ -1357,3 +1357,52 @@ body.light .latest-tx-block { color: #b45309; }
   .latest-tx-amount { grid-area: amount; }
   .latest-tx-tx { grid-area: tx; }
 }
+
+/* ---- MWC Game Asset (on-chain NFT) cards -------------------------------- */
+.badge-gameasset { background: rgba(126, 87, 194, 0.16); color: #b18ce8; }
+
+.ga-banner .card-header { border-bottom: 1px solid rgba(126, 87, 194, 0.25); }
+.ga-banner-line { padding: 2px 0; }
+.ga-banner-note { font-size: 12px; margin-top: 6px; }
+
+.ga-vout { padding: 10px 12px; }
+.ga-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ga-icon { font-size: 18px; line-height: 1; }
+.ga-name { font-weight: 600; }
+.ga-type {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em;
+  padding: 2px 8px; border-radius: 999px; color: #fff;
+}
+.ga-e-mint  { background: #2e7d32; }
+.ga-e-transfer, .ga-e-trade, .ga-e-reward { background: #1e5aa1; }
+.ga-e-market { background: #6a3fa1; }
+.ga-e-craft { background: #6b7280; }
+.ga-e-burn  { background: #a13030; }
+.ga-rarity { font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600; }
+.ga-r-common    { background: rgba(120, 120, 120, 0.15); color: #9aa4b2; }
+.ga-r-uncommon  { background: rgba(46, 125, 50, 0.15);  color: #66bb6a; }
+.ga-r-rare      { background: rgba(30, 90, 161, 0.18);  color: #64a5f4; }
+.ga-r-epic      { background: rgba(126, 87, 194, 0.2);  color: #b18ce8; }
+.ga-r-legendary { background: rgba(245, 165, 36, 0.16); color: #f5a524; }
+.ga-r-mythic    { background: rgba(216, 31, 106, 0.18); color: #f06292; }
+.ga-check { font-size: 11px; color: #66bb6a; }
+.ga-check-bad { color: #ef5350; font-weight: 700; }
+
+.ga-desc { margin-top: 6px; font-size: 13px; opacity: 0.85; }
+.ga-attrs { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
+.ga-attr {
+  font-size: 11px; padding: 2px 8px; border-radius: 6px;
+  background: var(--bg-hover, #182130); opacity: 0.9;
+}
+.ga-attr b { opacity: 0.65; font-weight: 600; margin-right: 2px; }
+
+.ga-details { margin-top: 8px; font-size: 12px; }
+.ga-details summary { cursor: pointer; opacity: 0.7; user-select: none; }
+.ga-details[open] summary { margin-bottom: 6px; }
+.ga-kv {
+  display: flex; gap: 10px; padding: 3px 0;
+  border-top: 1px solid var(--bg-hover, rgba(255, 255, 255, 0.06));
+  align-items: baseline;
+}
+.ga-k { min-width: 130px; opacity: 0.6; flex-shrink: 0; }
+.ga-v { word-break: break-all; }

@@ -1,13 +1,20 @@
-function displayTxVout(vout_list, fee = 0) {
+function displayTxVout(vout_list, fee = 0, txid = '') {
     vout_list.forEach(function(vout, index) {
         if ($('#tx-vout-list').find(`[data-tx-vout-index="${index}"]`).length == 0) {
             var spk = vout.scriptPubKey || {}
 
             if (spk.type == 'nulldata') {
-                $('#tx-vout-list').append(`
-                    <div class="list-group-item" data-tx-vout-index="${index}">
-                        <span class="text-muted mr-2">Data</span><code>${esc(spk.asm)}</code>
-                    </div>`)
+                // Game-asset payloads (Miners World: Onchain Adventures) render
+                // as decoded NFT cards; everything else stays raw data.
+                var ga = (typeof decodeGameAssetOutput === 'function') ? decodeGameAssetOutput(spk) : null
+                if (ga) {
+                    $('#tx-vout-list').append(gameAssetVoutHtml(ga, { index: index, txid: txid }))
+                } else {
+                    $('#tx-vout-list').append(`
+                        <div class="list-group-item" data-tx-vout-index="${index}">
+                            <span class="text-muted mr-2">Data</span><code>${esc(spk.asm)}</code>
+                        </div>`)
+                }
             } else if (spk.addresses != undefined) {
                 $('#tx-vout-list').append(`
                     <a href="#/address/${esc(spk.addresses[0])}" data-tx-vout-index="${index}" class="list-group-item list-group-item-action">

@@ -14,9 +14,15 @@ function displayTransactionInfo(data) {
     var fee = isCoinbase ? 0 : vin_amount - vout_amount
     var confirmed = data.blockhash != undefined
 
+    // On-chain game assets (Miners World: Onchain Adventures): if any output
+    // carries an MWC Game Asset OP_RETURN payload, show a decoded NFT banner.
+    var gameAssets = (typeof collectGameAssets === 'function') ? collectGameAssets(data) : []
+
     var status = confirmed
         ? `<span class="badge badge-ok">${fmtNum(data.confirmations)} confirmations</span>`
         : `<span class="badge badge-pending">Unconfirmed</span>`
+
+    if (gameAssets.length) status += ` <span class="badge badge-gameasset"><i class="fa-solid fa-gamepad"></i> Game Asset</span>`
 
     var content = `
         <div class="card kv-card mb-3">
@@ -39,13 +45,13 @@ function displayTransactionInfo(data) {
             ${data.locktime != 0 ? kvRow('Locktime', esc(data.locktime)) : ''}
         </div>`
 
-    $('#tx-info-table').html(content)
+    $('#tx-info-table').html((gameAssets.length ? gameAssetBannerHtml(gameAssets) : '') + content)
     $('#tx-vout-count').text(data.vout.length)
     $('#tx-vin-count').text(data.vin.length)
     $('#tx-vout-list').empty()
     $('#tx-vin-list').empty()
 
-    displayTxVout(data.vout, fee)
+    displayTxVout(data.vout, fee, data.txid)
     displayTxVin(data.vin)
 
     $('#tx-info-vout-total').removeClass('d-none')

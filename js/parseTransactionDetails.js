@@ -75,6 +75,13 @@ function parseTransactionDetails(data) {
     if (status.coinbase) {
         status.badge.text = 'Coinbase'
         status.badge.class = 'badge-coinbase'
+    } else {
+        // Game-asset transactions get their badge too (decoded OP_RETURN)
+        var gameAssets = (typeof collectGameAssets === 'function') ? collectGameAssets(data) : []
+        if (gameAssets.length) {
+            status.badge.text = 'Game Asset ' + gameAssets.map(function(ga) { return ga.type || 'v1' }).join('/')
+            status.badge.class = 'badge-gameasset'
+        }
     }
 
     return status
