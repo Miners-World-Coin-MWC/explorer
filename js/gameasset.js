@@ -345,6 +345,14 @@ var GA = (function () {
         return '<div class="ga-kv"><span class="ga-k">' + gaEsc(key) + '</span><span class="ga-v ' + (cls || '') + '">' + valueHtml + '</span></div>'
     }
 
+    /** Link to the game server's public asset page (registry asset id). */
+    function registryAssetHref(ga) {
+        var id = ga.registry && ga.registry.assetId
+        var base = (typeof GAME_API_BASE === 'string' ? GAME_API_BASE : '').replace(/\/+$/, '')
+        if (!id || !base) return '#'
+        return base + '/api/assets/' + encodeURIComponent(id) + '/history'
+    }
+
     function shortHex(h) {
         h = String(h == null ? '' : h)
         return h.length > 18 ? h.slice(0, 10) + '…' + h.slice(-8) : h
@@ -355,9 +363,9 @@ var GA = (function () {
         opts = opts || {}
         var idx = opts.index !== undefined ? opts.index : (ga.voutIndex !== undefined ? ga.voutIndex : '')
         var meta = (ga.body && ga.body.meta) || {}
-        var name = meta.name || (ga.legacy ? 'Legacy NFT anchor' : 'Game asset')
+        var name = meta.name || (ga.registry && ga.registry.name) || (ga.legacy ? 'Legacy NFT anchor' : 'Game asset')
         var icon = iconFor(ga)
-        var rarity = meta.rarity ? String(meta.rarity).toLowerCase() : ''
+        var rarity = (meta.rarity || (ga.registry && ga.registry.rarity) || '').toString().toLowerCase()
         var type = ga.type || 'ANCHOR'
         var head = ''
 
@@ -365,8 +373,11 @@ var GA = (function () {
         head += '<span class="ga-name">' + gaEsc(name) + '</span>'
         head += '<span class="ga-type ' + (EVENT_CLASS[type] || '') + '">' + gaEsc(type === 'ANCHOR' ? 'v1 ANCHOR' : type) + '</span>'
         if (rarity) head += '<span class="ga-rarity ' + (RARITY_CLASS[rarity] || '') + '">' + gaEsc(rarity) + '</span>'
+        if (ga.registry && ga.registry.nonTransferable) head += '<span class="ga-soulbound" title="Soul-bound: can never be transferred, traded or listed">soul-bound</span>'
         if (ga.integrityOk === true) head += '<span class="ga-check" title="SHA-256 body hash verified">✔ hash verified</span>'
         else if (ga.integrityOk === false) head += '<span class="ga-check ga-check-bad" title="Body hash mismatch">⚠ hash mismatch</span>'
+        if (ga.registryVerified === true) head += '<span class="ga-check" title="Registry body re-hashes to the on-chain commitment in this transaction">✔ commitment verified</span>'
+        else if (ga.registryVerified === false) head += '<span class="ga-check ga-check-bad" title="Registry body does NOT match the on-chain commitment">⚠ commitment mismatch</span>'
 
         var body = ''
 
@@ -409,7 +420,9 @@ var GA = (function () {
                 body += gaKv('Event sequence', gaEsc(ga.body.seq))
                 if (ga.body.controlVout === NO_SUCCESSOR) body += gaKv('Control output', 'none — terminal event')
                 else body += gaKv('Control output', 'vout ' + gaEsc(ga.body.controlVout))
-                body += gaKv('Payload mode', gaEsc(ga.modeName) + (ga.modeName === 'COMMITMENT' ? ' — body lives content-addressed in the game registry' : ''))
+                if (ga.registryVerified === true) body += gaKv('Payload mode', gaEsc(ga.modeName) + (ga.modeName === 'COMMITMENT' ? ' — body resolved from the game registry, SHA-256 re-verified against this transaction' : ''))
+                else if (ga.body && ga.modeName === 'COMMITMENT') body += gaKv('Payload mode', gaEsc(ga.modeName) + ' — body resolved from the game registry (commitment not independently verifiable)')
+                else body += gaKv('Payload mode', gaEsc(ga.modeName) + (ga.modeName === 'COMMITMENT' ? ' — body lives content-addressed in the game registry' : ''))
                 body += gaKv('Body hash', '<span class="mono">' + gaEsc(ga.bodyHash) + '</span>')
                 body += gaKv('Owner commitment', '<span class="mono">' + gaEsc(ga.body.ownerCommitment) + '</span>')
                 if (ga.body.prevEventTxid && ga.body.prevEventTxid !== '0000000000000000000000000000000000000000000000000000000000000000') {
@@ -432,6 +445,13 @@ var GA = (function () {
             body += '</details>'
         }
 
+        // Registry-sourced facts render for every protocol event, with or
+        // without an inline/resolved body — clearly marked as off-chain data.
+        if (!ga.legacy && ga.registry) {
+            var regNote = '<span class="ga-src">' + gaEsc(ga.registry.status) + (ga.registry.nonTransferable ? ' · soul-bound' : '') + ' · <a href="' + gaEsc(registryAssetHref(ga)) + '" target="_blank" rel="noopener">asset page</a></span>'
+            body += gaKv('Game registry', regNote)
+        }
+
         return '<div class="list-group-item ga-vout" data-tx-vout-index="' + gaEsc(idx) + '">' +
             '<div class="ga-head">' + head + '</div>' + body + '</div>'
     }
@@ -443,11 +463,13 @@ var GA = (function () {
         for (var i = 0; i < events.length; i++) {
             var ga = events[i]
             var meta = (ga.body && ga.body.meta) || {}
-            var name = meta.name || ga.assetId || 'Game asset'
-            var rarity = meta.rarity ? ' · ' + meta.rarity : ''
+            var name = meta.name || (ga.registry && ga.registry.name) || ga.assetId || 'Game asset'
+            var rarity = (meta.rarity || (ga.registry && ga.registry.rarity) || '') ? ' · ' + (meta.rarity || (ga.registry && ga.registry.rarity)) : ''
             lines += '<div class="ga-banner-line">' + iconFor(ga) + ' <b>' + gaEsc(name) + '</b>' +
                 gaEsc(rarity) + ' — <b>' + gaEsc(ga.type || 'v1 ANCHOR') + '</b>' +
                 (ga.integrityOk === false ? ' <span class="ga-check ga-check-bad">⚠ hash mismatch</span>' : '') +
+                (ga.registryVerified === true ? ' <span class="ga-check">✔ commitment verified</span>' : '') +
+                (ga.registryVerified === false ? ' <span class="ga-check ga-check-bad">⚠ commitment mismatch</span>' : '') +
                 '<span class="text-muted"> · output #' + gaEsc(ga.voutIndex !== undefined ? ga.voutIndex : '?') + '</span></div>'
         }
         return '<div class="card ga-banner mb-3">' +
@@ -455,12 +477,115 @@ var GA = (function () {
             '<div class="card-body">' + lines + '<div class="text-muted ga-banner-note">This transaction carries an MWC Game Asset record in its OP_RETURN output — see Outputs below for the decoded payload.</div></div></div>'
     }
 
+    // ---- registry resolution (COMMITMENT-mode metadata) ---------------------
+    // On-chain envelopes in COMMITMENT mode carry only a SHA-256 commitment;
+    // the full canonical body lives content-addressed in the game registry.
+    // GET {GAME_API_BASE}/api/assets/tx/{txid} returns it (public, CORS: *),
+    // including bodyHex so the client can RE-DERIVE the commitment itself and
+    // never take the registry's word for anything.
+    var registryCache = {}   // txid -> { state: 'pending'|'done'|'error', res: object|null }
+
+    function registryEndpoint(txid) {
+        var base = (typeof GAME_API_BASE === 'string' ? GAME_API_BASE : '').replace(/\/+$/, '')
+        return base ? base + '/api/assets/tx/' + encodeURIComponent(txid) : null
+    }
+
+    /** Fetch (cached, never throws, 6s timeout). Promise<object|null>. */
+    function fetchRegistryData(txid) {
+        var c = registryCache[txid]
+        if (c) return c.promise
+        var url = registryEndpoint(txid)
+        var entry = { state: 'error', res: null, promise: null }
+        entry.promise = !url
+            ? Promise.resolve(null)
+            : fetch(url, { signal: AbortSignal.timeout ? AbortSignal.timeout(6000) : undefined })
+                .then(function (r) { return r.ok ? r.json() : null })
+                .then(function (j) {
+                    if (j && j.ok) { entry.state = 'done'; entry.res = j; return j }
+                    entry.state = 'error'; return null
+                })
+                .catch(function () { entry.state = 'error'; return null })
+        registryCache[txid] = entry
+        return entry.promise
+    }
+
+    /**
+     * Enrich a decoded event with registry data (mutates ga):
+     *  - ga.body: parsed canonical body (COMMITMENT mode gets its body back)
+     *  - ga.registry: { assetId, name, status, rarity, category, owner, nonTransferable }
+     *  - ga.registryVerified: bodyHex re-hashes to the ON-CHAIN envelope hash
+     */
+    function applyRegistryData(ga, res) {
+        if (!res) return false
+        var changed = false
+        // 1. Independent commitment verification: hash the registry's canonical
+        //    body bytes and compare with the hash decoded from the tx itself.
+        //    (Only possible when the registry serves bodyHex.)
+        var verified = null
+        if (res.payload && res.payload.bodyHex && /^[0-9a-fA-F]+$/.test(res.payload.bodyHex)) {
+            try { verified = deriveBodyHash(hexToBytes(res.payload.bodyHex)) === ga.bodyHash } catch (e) { verified = null }
+        }
+        ga.registryVerified = verified
+        // 2. Fill in the body the chain couldn't carry (COMMITMENT mode).
+        //    Adopted unless PROVEN wrong; the badge only appears when the
+        //    commitment could actually be re-derived and matched.
+        if (!ga.body && res.payload && res.payload.bodyJson) {
+            try {
+                var body = JSON.parse(res.payload.bodyJson)
+                if (verified !== false) { ga.body = body; changed = true }
+            } catch (e) { /* leave hash-only view */ }
+        }
+        // 3. Registry-side asset facts (rendered alongside, clearly sourced).
+        if (res.asset) {
+            ga.registry = {
+                assetId: res.asset.assetId, name: res.asset.name, status: res.asset.status,
+                rarity: res.asset.rarity, category: res.asset.category, owner: res.asset.owner,
+                nonTransferable: !!res.asset.nonTransferable,
+            }
+            changed = true
+        }
+        return changed
+    }
+
+    /**
+     * Called from the transaction page after the first render. If any event is
+     * COMMITMENT-mode, fetches the registry data, enriches the events and asks
+     * the caller to re-render once. Safe to call on every render: cached per
+     * txid, and synchronous application when the data is already in cache.
+     * Returns true when a re-render was scheduled (caller must not re-invoke).
+     */
+    function enhanceGameAssets(txid, gameAssets, onReady) {
+        if (!gameAssets || !gameAssets.length) return false
+        var needs = false
+        for (var i = 0; i < gameAssets.length; i++) {
+            var ga = gameAssets[i]
+            if (!ga.legacy && ga.mode === 0 && (!ga.body || !ga.registry)) needs = true
+        }
+        if (!needs) return false
+        var cached = registryCache[txid]
+        if (cached && cached.state === 'done') {
+            // Data already fetched on a previous render of this tx: apply
+            // synchronously, no re-render loop.
+            for (var j = 0; j < gameAssets.length; j++) applyRegistryData(gameAssets[j], cached.res)
+            return false   // caller renders with enriched events right now
+        }
+        if (cached && cached.state === 'pending') return false
+        fetchRegistryData(txid).then(function (res) {
+            if (!res) return
+            for (var k = 0; k < gameAssets.length; k++) applyRegistryData(gameAssets[k], res)
+            if (typeof onReady === 'function') onReady()
+        })
+        return true   // a re-render is scheduled; caller shouldn't schedule another
+    }
+
     return {
         MAGIC: MAGIC, BURN_ADDRESS: BURN_ADDRESS, EVENT_NAMES: EVENT_NAMES, NO_SUCCESSOR: NO_SUCCESSOR,
         sha256Bytes: sha256Bytes, protoHash: protoHash, deriveBodyHash: deriveBodyHash, deriveAssetId: deriveAssetId,
         hexToBytes: hexToBytes, bytesToHex: bytesToHex, extractOpReturnData: extractOpReturnData,
         decodeEnvelope: decodeEnvelope, decodeGameAssetOutput: decodeGameAssetOutput, collectGameAssets: collectGameAssets,
-        gameAssetVoutHtml: gameAssetVoutHtml, gameAssetBannerHtml: gameAssetBannerHtml
+        gameAssetVoutHtml: gameAssetVoutHtml, gameAssetBannerHtml: gameAssetBannerHtml,
+        fetchRegistryData: fetchRegistryData, applyRegistryData: applyRegistryData, enhanceGameAssets: enhanceGameAssets,
+        registryCache: registryCache
     }
 })()
 
@@ -470,6 +595,7 @@ if (typeof window !== 'undefined') {
     window.collectGameAssets = GA.collectGameAssets
     window.gameAssetVoutHtml = GA.gameAssetVoutHtml
     window.gameAssetBannerHtml = GA.gameAssetBannerHtml
+    window.enhanceGameAssets = GA.enhanceGameAssets
     window.GA_PROTOCOL = GA
 }
 // Node (unit tests)

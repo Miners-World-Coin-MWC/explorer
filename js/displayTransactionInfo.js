@@ -1,4 +1,4 @@
-function displayTransactionInfo(data) {
+function displayTransactionInfo(data, isRerender) {
     var isCoinbase = data.vin.some(function(vin) { return vin.coinbase != undefined })
 
     var vin_amount = 0
@@ -56,4 +56,12 @@ function displayTransactionInfo(data) {
 
     $('#tx-info-vout-total').removeClass('d-none')
     $('#tx-info-vin-total').removeClass('d-none')
+
+    // COMMITMENT-mode payloads carry only a hash on chain. Ask the game
+    // registry for the full body + metadata; when it arrives (once per tx),
+    // re-render with names/rarities AND the re-verified commitment. The
+    // hash-only view above stays up if the registry is unreachable.
+    if (!isRerender && gameAssets.length && typeof enhanceGameAssets === 'function') {
+        enhanceGameAssets(data.txid, gameAssets, function() { displayTransactionInfo(data, true) })
+    }
 }

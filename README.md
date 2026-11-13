@@ -3,6 +3,33 @@
 Static, dependency-light blockchain explorer for MinersWorldCoin (MWC). Open `index.html`
 (or serve the folder with any static web server) and it talks to `https://api.minersworld.org`.
 
+## On-chain game assets (NFTs) from Miners World
+
+The game "Miners World: Onchain Adventures" anchors every in-game item/NFT to the chain with an
+OP_RETURN payload (`MWC-GAME-ASSET` protocol). Transaction pages decode these payloads natively:
+
+- **v2 protocol txs** show an "On-chain game asset" banner + a rich vout row (event type, rarity,
+  metadata attributes, control UTXO, previous-event links, hash-integrity badge).
+- **INLINE payloads** are fully decoded + SHA-256 verified straight off the chain.
+- **COMMITMENT payloads** (only a hash fits on chain) are resolved against the game registry:
+  `js/gameasset.js` fetches `GET {GAME_API_BASE}/api/assets/tx/{txid}` (public, CORS `*`), which
+  returns the canonical body incl. `bodyHex` — the page then **re-derives the SHA-256 commitment
+  itself** and badges the asset "✔ commitment verified" (or "⚠ mismatch"). Nothing is displayed as
+  verified that isn't re-checked against this transaction's own OP_RETURN hash.
+- **Legacy v1 JSON anchors** (`{"v":1,"a":"MWC1-…"}`) still decode.
+
+Set `GAME_API_BASE` in `js/config.js` to the game server's **HTTPS** origin. The explorer is served
+over HTTPS, so browsers silently block fetches to plain-`http://` origins (mixed content): until the
+game API has TLS in front of it, COMMITMENT payloads fall back to the hash-only view (with registry
+names whenever `/api/assets/tx/…` is reachable) — no error, no false data.
+
+Tests (no dependencies, Node 18+):
+
+```bash
+node tools/test-gameasset.mjs           # unit tests incl. live chain fixtures
+node tools/integration-gameasset.mjs    # live chain + live registry end-to-end
+```
+
 ## What changed in this version
 - New design system in `css/style.css` (tokens for dark/light, one accent colour, Inter + JetBrains Mono)
 - Cleaner navigation (Wallets / Network / Ecosystem / API), network switcher pill, theme toggle that

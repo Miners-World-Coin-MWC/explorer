@@ -1387,6 +1387,11 @@ body.light .latest-tx-block { color: #b45309; }
 .ga-r-mythic    { background: rgba(216, 31, 106, 0.18); color: #f06292; }
 .ga-check { font-size: 11px; color: #66bb6a; }
 .ga-check-bad { color: #ef5350; font-weight: 700; }
+.ga-soulbound {
+  font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600;
+  background: rgba(3, 169, 244, 0.16); color: #4fc3f7;
+}
+.ga-src { font-size: 12px; opacity: 0.85; }
 
 .ga-desc { margin-top: 6px; font-size: 13px; opacity: 0.85; }
 .ga-attrs { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 6px; }
