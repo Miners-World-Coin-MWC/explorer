@@ -360,6 +360,13 @@ var GA = (function () {
         return h.length > 18 ? h.slice(0, 10) + '…' + h.slice(-8) : h
     }
 
+    /** v1-era asset: JSON OP_RETURN anchor or a registry MWC1-… id (pre-protocol). */
+    function isLegacyGa(ga) {
+        if (ga.legacy) return true
+        var id = (ga.registry && ga.registry.assetId) || ga.assetId || ''
+        return /^MWC1-/i.test(String(id))
+    }
+
     // Full row for the transaction's Outputs list
     function gameAssetVoutHtml(ga, opts) {
         opts = opts || {}
@@ -376,6 +383,7 @@ var GA = (function () {
         head += '<span class="ga-icon">' + icon + '</span>'
         head += '<span class="ga-name">' + gaEsc(name) + '</span>'
         head += '<span class="ga-type ' + (EVENT_CLASS[type] || '') + '">' + gaEsc(type === 'ANCHOR' ? 'v1 ANCHOR' : type) + '</span>'
+        if (isLegacyGa(ga)) head += '<span class="ga-legacy" title="Legacy asset — minted before the MWC Game Asset protocol (v1 JSON anchor / MWC1-… id)">legacy</span>'
         if (rarity) head += '<span class="ga-rarity ' + (RARITY_CLASS[rarity] || '') + '">' + gaEsc(rarity) + '</span>'
         if (ga.registry && ga.registry.nonTransferable) head += '<span class="ga-soulbound" title="Soul-bound: can never be transferred, traded or listed">soul-bound</span>'
         if (ga.integrityOk === true) head += '<span class="ga-check" title="SHA-256 body hash verified">✔ hash verified</span>'
@@ -474,6 +482,7 @@ var GA = (function () {
             var rarity = (meta.rarity || (ga.registry && ga.registry.rarity) || '') ? ' · ' + (meta.rarity || (ga.registry && ga.registry.rarity)) : ''
             lines += '<div class="ga-banner-line">' + iconFor(ga) + ' <b>' + gaEsc(name) + '</b>' +
                 gaEsc(rarity) + ' — <b>' + gaEsc(ga.type || 'v1 ANCHOR') + '</b>' +
+                (isLegacyGa(ga) ? ' <span class="ga-legacy">legacy</span>' : '') +
                 (ga.integrityOk === false ? ' <span class="ga-check ga-check-bad">⚠ hash mismatch</span>' : '') +
                 (ga.registryVerified === true ? ' <span class="ga-check">✔ commitment verified</span>' : '') +
                 (ga.registryVerified === false ? ' <span class="ga-check ga-check-bad">⚠ commitment mismatch</span>' : '') +
@@ -668,6 +677,7 @@ var GA = (function () {
         gameAssetVoutHtml: gameAssetVoutHtml, gameAssetBannerHtml: gameAssetBannerHtml,
         fetchRegistryData: fetchRegistryData, applyRegistryData: applyRegistryData, applyCachedRegistryData: applyCachedRegistryData,
         enhanceGameAssets: enhanceGameAssets,
+        loadSnapshot: loadSnapshot, snapshotUrls: snapshotUrls, snapshotLookup: snapshotLookup,
         registryCache: registryCache
     }
 })()

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css">
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+		<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+		<link rel="stylesheet" href="css/style.css">
+		<title>Game Assets | MinersWorldCoin Explorer</title>
+		<meta name="description" content="Every Miners World on-chain game asset (NFT) anchored on the MWC blockchain.">
+
+		<meta name="theme-color" content="#0a0e14">
+	</head>
+	<body>
+		<script>
+			(function () {
+				try {
+					var t = localStorage.getItem('mwc-theme');
+					if (t ? t === 'light' : window.matchMedia('(prefers-color-scheme: light)').matches) {
+						document.body.classList.add('light');
+					}
+				} catch (e) {}
+			})();
+		</script>
+		<!-- Navbar -->
+		<nav class="navbar fixed-top navbar-expand-lg navbar-dark">
+			<div class="container">
+				<a href="index.html" class="navbar-brand">
+					<img src="img/mwc.png" alt="MWC logo">
+					<span><b>MWC</b> <span class="brand-sub">Game Assets</span></span>
+				</a>
+				<button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarResponsive">
+					<ul class="navbar-nav ml-auto align-items-lg-center">
+						<li class="nav-item">
+							<a href="index.html" class="nav-link">Explorer</a>
+						</li>
+						<li class="nav-item">
+							<a href="richlist.html" class="nav-link">Richlist</a>
+							<li class="nav-item">
+								<a href="assets.html" class="nav-link active">Game Assets</a>
+							</li>
+						</li>
+						<li class="nav-item">
+							<a href="pools.html" class="nav-link">Pools</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Wallets</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<a class="dropdown-item" href="webwallet.html">Web Wallet</a>
+								<a class="dropdown-item" href="walletgen.html">Paper Wallet</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Network</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<h6 class="dropdown-header">Peers</h6>
+								<a class="dropdown-item" href="peers.html">Mainnet</a>
+								<a class="dropdown-item" href="peers.html?testnet=1">Testnet</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Peer map</h6>
+								<a class="dropdown-item" href="peermap.html">Mainnet</a>
+								<a class="dropdown-item" href="peermap.html?testnet=1">Testnet</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Addnodes</h6>
+								<a class="dropdown-item" href="addnodes.html">Mainnet</a>
+								<a class="dropdown-item" href="addnodes.html?testnet=1">Testnet</a>
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Ecosystem</a>
+							<div class="dropdown-menu dropdown-menu-right">
+								<h6 class="dropdown-header">Mining pools</h6>
+								<a class="dropdown-item" href="https://bmine.net" target="_blank" rel="noopener">BMine</a>
+								<a class="dropdown-item" href="https://pool.rplant.xyz/#minersworldcoin#connect" target="_blank" rel="noopener">Rplant</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Exchanges</h6>
+								<a class="dropdown-item" href="https://cexius.com" target="_blank" rel="noopener">Cexius</a>
+								<a class="dropdown-item" href="https://nestex.one/?ref=95B2A537D5A7D49101E29337A9FFD13D" target="_blank" rel="noopener">NestEx</a>
+								<div class="dropdown-divider"></div>
+								<h6 class="dropdown-header">Links</h6>
+								<a class="dropdown-item" href="https://minersworld.org" target="_blank" rel="noopener">Main site</a>
+								<a class="dropdown-item" href="https://mwc-backup.vercel.app/" target="_blank" rel="noopener">Mirror</a>
+								<a class="dropdown-item" href="https://miners-world-coin-mwc.github.io/explorer" target="_blank" rel="noopener">Explorer mirror</a>
+							</div>
+						</li>
+						<li class="nav-item">
+							<a href="https://api.minersworld.org" class="nav-link" target="_blank" rel="noopener">API</a>
+						</li>
+						<li class="nav-item ml-lg-2">
+							<button id="themeToggle" type="button" class="btn btn-sm" aria-label="Toggle light/dark theme" title="Toggle theme">
+								<i class="fa-solid fa-circle-half-stroke"></i>
+							</button>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+		<div class="container">
+			<div class="page-head">
+				<h1>Game Assets <span class="pill" style="vertical-align:middle;font-size:12px">MWC-GAME-ASSET</span></h1>
+				<p>Every on-chain item, creature and badge minted by <a href="https://game.minersworld.org" target="_blank" rel="noopener">Miners World: Onchain Adventures</a>, anchored to the MWC blockchain with OP_RETURN commitments. Verify any row against its anchoring transaction &mdash; the chain is the authority.</p>
+			</div>
+
+			<div class="stat-tiles mb-3">
+				<div class="stat-tile">
+					<div class="stat-label"><i class="fa-solid fa-gamepad"></i> Assets</div>
+					<div class="stat-value" id="ga-count">&ndash;</div>
+					<div class="stat-sub" id="ga-unresolved">&nbsp;</div>
+				</div>
+				<div class="stat-tile">
+					<div class="stat-label"><i class="fa-solid fa-clock-rotate-left"></i> Snapshot</div>
+					<div class="stat-value" id="ga-updated">&ndash;</div>
+					<div class="stat-sub" id="ga-height">&nbsp;</div>
+				</div>
+			</div>
+
+			<div id="ga-empty" class="card d-none mb-3">
+				<div class="card-body text-center">
+					<p class="mb-2"><b>No game assets in the snapshot yet.</b></p>
+					<p class="text-muted mb-0">The snapshot refreshes automatically from the chain. Come back after the next registry scan, or mint something in-game.</p>
+				</div>
+			</div>
+
+			<div class="section-title">
+				<span>On-chain assets</span>
+				<small>newest mints first</small>
+			</div>
+			<div class="search-wrap" style="margin-bottom:12px">
+				<div class="search-box">
+					<i class="fa-solid fa-filter"></i>
+					<input type="text" id="ga-filter" placeholder="Filter by name, id, category, rarity, status or custody address" aria-label="Filter assets" autocomplete="off">
+				</div>
+			</div>
+			<div class="card mb-3">
+				<div class="table-responsive">
+					<table class="table table-hover mb-0" id="ga-table">
+						<thead>
+							<tr>
+								<th scope="col">Asset</th>
+								<th scope="col">Category</th>
+								<th scope="col">Status</th>
+								<th scope="col">Custody address</th>
+								<th scope="col">Mint tx</th>
+								<th scope="col">Events</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+			<p class="text-muted" style="font-size:12px">Custody address = the live control UTXO holding the asset (one per player, custodied by the game wallet). &ldquo;legacy&rdquo; rows were minted before the asset protocol as v1 JSON anchors.</p>
+		</div>
+
+	<!-- Footer -->
+		<footer>
+			<div class="container text-center">
+				<div class="social-links mb-3">
+					<a href="https://discord.gg/5HZGx5bbKK" target="_blank" rel="noopener" aria-label="Discord"><i class="fab fa-discord"></i></a>
+					<a href="https://t.me/+0IfF9E76ETZiNDQ8" target="_blank" rel="noopener" aria-label="Telegram"><i class="fab fa-telegram"></i></a>
+					<a href="https://www.reddit.com/r/MinersWorldCoin/" target="_blank" rel="noopener" aria-label="Reddit"><i class="fab fa-reddit"></i></a>
+					<a href="https://x.com/minerworldcoin" target="_blank" rel="noopener" aria-label="X"><i class="fab fa-x-twitter"></i></a>
+				</div>
+				<div>
+					&copy; <span id="year"></span> <a target="_blank" rel="noopener" href="https://github.com/Miners-World-Coin-MWC">MinersWorldCoin Team</a>
+					&middot; <a href="https://api.minersworld.org" target="_blank" rel="noopener">API</a>
+				</div>
+			</div>
+		</footer>
+		<script>document.getElementById("year").textContent = new Date().getFullYear()</script>
+
+		<script src="js/addressLabels.js"></script>
+		<script src="js/timeFormat.js"></script>
+		<script src="js/toggle.js"></script>
+		<script src="js/config.js"></script>
+		<script src="js/gameasset.js"></script>
+		<script src="js/assets.js"></script>
+	</body>
+</html>

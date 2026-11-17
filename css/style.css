@@ -1391,6 +1391,10 @@ body.light .latest-tx-block { color: #b45309; }
   font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600;
   background: rgba(3, 169, 244, 0.16); color: #4fc3f7;
 }
+.ga-legacy {
+  font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 600;
+  background: rgba(107, 114, 128, 0.2); color: #9aa4b2;
+}
 .ga-src { font-size: 12px; opacity: 0.85; }
 
 .ga-desc { margin-top: 6px; font-size: 13px; opacity: 0.85; }
