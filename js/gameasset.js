@@ -350,7 +350,9 @@ var GA = (function () {
         var id = ga.registry && ga.registry.assetId
         var base = (typeof GAME_API_BASE === 'string' ? GAME_API_BASE : '').replace(/\/+$/, '')
         if (!id || !base) return '#'
-        return base + '/api/assets/' + encodeURIComponent(id) + '/history'
+        // /api/assets/<id> serves the human page to browsers (content
+        // negotiation) and raw JSON to API clients — no /history suffix needed
+        return base + '/api/assets/' + encodeURIComponent(id)
     }
 
     function shortHex(h) {
@@ -363,7 +365,9 @@ var GA = (function () {
         opts = opts || {}
         var idx = opts.index !== undefined ? opts.index : (ga.voutIndex !== undefined ? ga.voutIndex : '')
         var meta = (ga.body && ga.body.meta) || {}
-        var name = meta.name || (ga.registry && ga.registry.name) || (ga.legacy ? 'Legacy NFT anchor' : 'Game asset')
+        // BURN envelopes key the item name as `item` (older ones only that);
+        // fall through so burned items render with their name, like badges
+        var name = meta.name || meta.item || (ga.registry && ga.registry.name) || (ga.legacy ? 'Legacy NFT anchor' : 'Game asset')
         var icon = iconFor(ga)
         var rarity = (meta.rarity || (ga.registry && ga.registry.rarity) || '').toString().toLowerCase()
         var type = ga.type || 'ANCHOR'
@@ -466,7 +470,7 @@ var GA = (function () {
         for (var i = 0; i < events.length; i++) {
             var ga = events[i]
             var meta = (ga.body && ga.body.meta) || {}
-            var name = meta.name || (ga.registry && ga.registry.name) || ga.assetId || 'Game asset'
+            var name = meta.name || meta.item || (ga.registry && ga.registry.name) || ga.assetId || 'Game asset'
             var rarity = (meta.rarity || (ga.registry && ga.registry.rarity) || '') ? ' · ' + (meta.rarity || (ga.registry && ga.registry.rarity)) : ''
             lines += '<div class="ga-banner-line">' + iconFor(ga) + ' <b>' + gaEsc(name) + '</b>' +
                 gaEsc(rarity) + ' — <b>' + gaEsc(ga.type || 'v1 ANCHOR') + '</b>' +
